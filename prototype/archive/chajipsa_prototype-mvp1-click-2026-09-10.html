@@ -1,0 +1,775 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>차집사 프로토타입</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@400;700;800&family=Playfair+Display:wght@600;700&display=swap">
+<style>
+  :root {
+    --p50:#F3EEFA; --p100:#E0D2F0; --p200:#C4A9E3; --p300:#A67FD3; --p400:#8A5BC0;
+    --p500:#6B3FA0; --p600:#5A3489; --p700:#472968; --p800:#331E4A; --p900:#20132E;
+    --primary:var(--p500);
+    --ink:#1A1A3A; --ink-deep:#14101F; --steel:#5B5B72; --neutral:#9797A8;
+    --line:#E7E3EF; --line-soft:#F0EDF5;
+    --off:#FAFAF8; --white:#FFFFFF;
+    --lime:#C4FF4D; --lime-ink:#3B4D07;
+    --success:#2ECC8A; --success-50:#E6F9F1; --success-800:#0F6B45;
+    --warning:#F5A623; --warning-50:#FEF3E0; --warning-800:#8A5A0A;
+    --danger:#E24B4A; --danger-50:#FCE9E9; --danger-800:#8E2323;
+    --sans: Pretendard, "Gothic A1", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, -apple-system, sans-serif;
+    --serif: "Playfair Display", Georgia, "Times New Roman", serif;
+    --r-btn:8px; --r-card:12px; --r-lg:16px; --r-pill:999px;
+    --page-bg:#EDE8F4; --page-ink:#1A1A3A;
+  }
+  * { box-sizing:border-box; }
+  html, body { height:100%; }
+  body {
+    margin:0; background:var(--page-bg); color:var(--page-ink);
+    font-family:var(--sans); font-size:14px; line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  button { font-family:inherit; font-size:inherit; cursor:pointer; }
+  button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible { outline:2px solid var(--p400); outline-offset:2px; }
+  .shell { min-height:100%; display:flex; flex-direction:column; }
+
+  /* ---------- Top bar (prototype chrome) ---------- */
+  .topbar {
+    display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+    padding-block:14px; padding-inline:24px;
+    background:var(--white); border-bottom:1px solid var(--line);
+  }
+  .brand { display:flex; align-items:center; gap:10px; }
+  .brand .mark { width:32px; height:32px; border-radius:8px; }
+  .brand strong { font-size:16px; font-weight:800; color:var(--ink); letter-spacing:-0.01em; }
+  .brand span { font-size:12px; color:var(--neutral); margin-left:6px; }
+  .seg { display:inline-flex; background:var(--p50); border-radius:var(--r-pill); padding:3px; margin-left:auto; }
+  .seg button {
+    border:0; background:transparent; color:var(--steel); padding:7px 16px; border-radius:var(--r-pill); font-weight:700;
+  }
+  .seg button[aria-pressed="true"] { background:var(--ink-deep); color:var(--white); }
+  .meta { font-size:12px; color:var(--neutral); }
+  .meta b { color:var(--steel); font-weight:700; }
+
+  /* ---------- Stage ---------- */
+  .stage {
+    flex:1; display:grid; grid-template-columns:280px minmax(0,1fr); gap:32px;
+    padding-block:32px; padding-inline:24px; max-width:1100px; width:100%; margin:0 auto;
+  }
+  .flow { display:flex; flex-direction:column; gap:12px; }
+  .flow h2 { margin:0; font-size:12px; font-weight:700; color:var(--neutral); letter-spacing:0.06em; text-transform:uppercase; }
+  .flow ol { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:4px; }
+  .flow li button {
+    width:100%; text-align:left; border:0; background:transparent; padding:8px 10px; border-radius:var(--r-btn);
+    display:flex; gap:10px; align-items:baseline; color:var(--steel);
+  }
+  .flow li button:hover { background:var(--white); }
+  .flow li button[aria-current="true"] { background:var(--white); color:var(--ink); font-weight:700; box-shadow:0 1px 0 var(--line); }
+  .flow li button .n { font-family:var(--serif); font-size:13px; color:var(--p400); min-width:18px; }
+  .flow .note { font-size:12px; color:var(--neutral); border-top:1px solid var(--line); padding-top:12px; line-height:1.6; }
+  .flow .note b { color:var(--steel); }
+
+  .device-wrap { display:flex; flex-direction:column; align-items:center; gap:14px; }
+  .device {
+    width:390px; max-width:100%; height:780px; background:var(--off); border-radius:44px;
+    border:8px solid var(--ink-deep); box-shadow:0 30px 60px -30px rgba(32,19,46,0.5);
+    position:relative; overflow:hidden; display:flex; flex-direction:column;
+  }
+  .statusbar {
+    height:44px; display:flex; align-items:center; justify-content:space-between; padding-inline:26px 22px;
+    font-size:13px; font-weight:700; color:var(--ink); flex:0 0 auto;
+  }
+  .statusbar .notch { position:absolute; left:50%; top:10px; transform:translateX(-50%); width:110px; height:28px; background:var(--ink-deep); border-radius:var(--r-pill); }
+  .screen { flex:1; overflow-y:auto; overflow-x:hidden; display:flex; flex-direction:column; }
+  .screen::-webkit-scrollbar { width:0; }
+  .tabbar {
+    flex:0 0 auto; display:grid; grid-auto-flow:column; grid-auto-columns:1fr; border-top:1px solid var(--line);
+    background:var(--white); padding-block:8px 18px;
+  }
+  .tabbar button { border:0; background:transparent; display:flex; flex-direction:column; align-items:center; gap:3px; color:var(--neutral); font-size:11px; font-weight:700; }
+  .tabbar button svg { width:22px; height:22px; }
+  .tabbar button[aria-current="true"] { color:var(--primary); }
+  .tabbar[hidden] { display:none; }
+  .hint { font-size:12px; color:var(--neutral); text-align:center; }
+
+  /* ---------- In-app primitives ---------- */
+  .page { padding-inline:20px; padding-block:8px 24px; display:flex; flex-direction:column; gap:16px; flex:1; }
+  .apphead { display:flex; align-items:center; gap:10px; min-height:40px; }
+  .apphead .back { border:0; background:transparent; width:36px; height:36px; margin-left:-8px; border-radius:var(--r-btn); display:grid; place-items:center; color:var(--ink); }
+  .apphead h1 { margin:0; font-size:20px; font-weight:700; color:var(--ink); text-wrap:balance; }
+  .apphead .right { margin-left:auto; font-size:12px; color:var(--neutral); }
+  .eyebrow { font-size:12px; font-weight:700; color:var(--neutral); letter-spacing:0.04em; }
+  .h2 { margin:0; font-size:16px; font-weight:700; color:var(--ink); }
+  .display { font-size:24px; font-weight:800; color:var(--ink); line-height:1.3; margin:0; letter-spacing:-0.01em; text-wrap:balance; }
+  .muted { color:var(--steel); }
+  .small { font-size:12px; color:var(--neutral); }
+  .num { font-family:var(--serif); font-weight:700; font-variant-numeric:tabular-nums; }
+
+  .card { background:var(--white); border:1px solid var(--line); border-radius:var(--r-lg); padding:20px; display:flex; flex-direction:column; gap:12px; }
+  .card.tight { padding:16px; border-radius:var(--r-card); }
+  .card.reco { border:2px solid var(--primary); }
+  .card.dark { background:var(--ink-deep); border-color:var(--ink-deep); color:var(--white); }
+  .card.dark .small, .card.dark .muted { color:rgba(255,255,255,0.65); }
+  .card.soft { background:var(--p50); border-color:var(--p50); }
+  .row { display:flex; align-items:center; gap:12px; }
+  .row.between { justify-content:space-between; }
+  .stack { display:flex; flex-direction:column; gap:8px; }
+  .kv { display:grid; grid-template-columns:96px 1fr; gap:6px 12px; font-size:13px; }
+  .kv dt { color:var(--neutral); margin:0; }
+  .kv dd { margin:0; color:var(--ink); }
+
+  .btn { border:0; border-radius:var(--r-btn); padding:14px 28px; font-weight:700; font-size:15px; display:inline-flex; align-items:center; justify-content:center; gap:8px; width:100%; }
+  .btn.primary { background:var(--ink-deep); color:var(--white); }
+  .btn.primary .arrow { color:var(--lime); }
+  .btn.purple { background:var(--primary); color:var(--white); }
+  .btn.ghost { background:transparent; border:1.5px solid var(--primary); color:var(--primary); }
+  .btn.soft { background:var(--p100); color:var(--p700); }
+  .btn.line { background:var(--white); border:1px solid var(--line); color:var(--ink); }
+  .btn.danger { background:var(--danger-50); color:var(--danger-800); }
+  .btn.sm { padding:9px 14px; font-size:13px; width:auto; }
+  .btn:disabled { opacity:0.45; cursor:not-allowed; }
+  .btnrow { display:flex; gap:8px; }
+  .btnrow .btn { flex:1; }
+
+  .pill { display:inline-flex; align-items:center; gap:6px; border-radius:var(--r-pill); padding:5px 12px; font-size:12px; font-weight:700; line-height:1.2; white-space:nowrap; }
+  .pill.purple { background:var(--p50); color:var(--p800); }
+  .pill.success { background:var(--success-50); color:var(--success-800); }
+  .pill.warning { background:var(--warning-50); color:var(--warning-800); }
+  .pill.danger { background:var(--danger-50); color:var(--danger-800); }
+  .pill.neutral { background:var(--line-soft); color:var(--steel); }
+  .pill.lime { background:var(--ink-deep); color:var(--white); }
+  .dot { width:8px; height:8px; border-radius:50%; background:currentColor; flex:0 0 auto; }
+  .dot.lime { background:var(--lime); }
+
+  .field { display:flex; flex-direction:column; gap:6px; }
+  .field label { font-size:12px; font-weight:700; color:var(--steel); }
+  .input { width:100%; border:1px solid var(--line); border-radius:var(--r-btn); padding:12px 14px; font-size:15px; background:var(--white); color:var(--ink); font-family:inherit; }
+  .input:focus { border-color:var(--p400); outline:none; }
+  .choice { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .choice button { border:1px solid var(--line); background:var(--white); border-radius:var(--r-btn); padding:12px; font-weight:700; color:var(--steel); }
+  .choice button[aria-pressed="true"] { border-color:var(--primary); color:var(--p700); background:var(--p50); }
+
+  .list { display:flex; flex-direction:column; }
+  .list .item { display:flex; align-items:center; gap:12px; padding-block:12px; border-top:1px solid var(--line-soft); text-align:left; background:transparent; border-left:0; border-right:0; border-bottom:0; width:100%; color:inherit; }
+  .list .item:first-child { border-top:0; }
+  .list .item .grow { flex:1; min-width:0; }
+  .list .item .t { font-weight:700; color:var(--ink); }
+  .list .item .s { font-size:12px; color:var(--neutral); }
+  .list .item .chev { color:var(--neutral); }
+
+  .photo { aspect-ratio:4/3; border-radius:var(--r-card); position:relative; overflow:hidden; display:grid; place-items:center; color:var(--white); font-weight:700; font-size:13px; border:0; width:100%; }
+  .photo.before { background:linear-gradient(135deg,#7D7A8C 0%,#B3B0BE 100%); }
+  .photo.after { background:linear-gradient(135deg,#8A5BC0 0%,#C4A9E3 100%); }
+  .photo .tag { position:absolute; top:10px; left:10px; background:rgba(20,16,31,0.7); padding:4px 10px; border-radius:var(--r-pill); font-size:11px; }
+  .photo .shot { position:absolute; bottom:10px; right:10px; background:var(--lime); color:var(--lime-ink); padding:4px 10px; border-radius:var(--r-pill); font-size:11px; }
+  .photos { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+
+  .cal { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; text-align:center; font-size:12px; }
+  .cal .d { padding:6px 0; border-radius:8px; color:var(--steel); position:relative; }
+  .cal .d.dim { color:var(--line); }
+  .cal .d.today { background:var(--ink-deep); color:var(--white); font-weight:700; }
+  .cal .d.wash::after, .cal .d.oil::after { content:""; position:absolute; left:50%; bottom:2px; transform:translateX(-50%); width:5px; height:5px; border-radius:50%; }
+  .cal .d.wash::after { background:var(--primary); }
+  .cal .d.oil::after { background:var(--warning); }
+  .cal .d.today.wash::after { background:var(--lime); }
+  .legend { display:flex; gap:14px; font-size:11px; color:var(--neutral); }
+  .legend i { display:inline-block; width:6px; height:6px; border-radius:50%; margin-right:5px; vertical-align:middle; }
+
+  .plans { display:flex; flex-direction:column; gap:10px; }
+  .plan { border:1px solid var(--line); background:var(--white); border-radius:var(--r-lg); padding:16px; display:flex; align-items:center; gap:12px; text-align:left; width:100%; color:inherit; }
+  .plan[aria-pressed="true"] { border:2px solid var(--primary); padding:15px; }
+  .plan .price { font-family:var(--serif); font-size:22px; color:var(--ink); }
+  .plan .price small { font-family:var(--sans); font-size:12px; color:var(--neutral); font-weight:400; }
+  .plan .grow { flex:1; }
+  .plan .t { font-weight:700; color:var(--ink); }
+  .plan .s { font-size:12px; color:var(--neutral); }
+
+  .steps { display:flex; flex-direction:column; gap:0; }
+  .step { display:grid; grid-template-columns:20px 1fr; gap:12px; padding-block:8px; position:relative; }
+  .step .b { width:20px; height:20px; border-radius:50%; border:2px solid var(--line); background:var(--white); display:grid; place-items:center; font-size:10px; font-weight:700; color:var(--neutral); }
+  .step.done .b { background:var(--success); border-color:var(--success); color:var(--white); }
+  .step.now .b { background:var(--ink-deep); border-color:var(--ink-deep); color:var(--lime); }
+  .step .t { font-weight:700; color:var(--steel); }
+  .step.done .t, .step.now .t { color:var(--ink); }
+  .step .s { font-size:12px; color:var(--neutral); }
+
+  /* ---------- Scan ---------- */
+  .cam { position:relative; background:radial-gradient(120% 80% at 50% 30%, #3A3350 0%, #1D1829 70%); border-radius:var(--r-lg); aspect-ratio:3/4; overflow:hidden; color:var(--white); display:flex; flex-direction:column; justify-content:flex-end; }
+  .cam .grid { position:absolute; inset:0; background-image:linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px); background-size:32px 32px; }
+  .cam .car { position:absolute; left:50%; top:40%; transform:translate(-50%,-50%); width:190px; opacity:0.85; }
+  .cam .plate { position:absolute; left:50%; top:52%; transform:translate(-50%,-50%); background:#F5F5F0; color:#1A1A3A; font-weight:800; font-size:20px; letter-spacing:0.06em; padding:6px 14px; border-radius:4px; border:2px solid #C9C9C0; font-variant-numeric:tabular-nums; }
+  .cam .box { position:absolute; left:50%; top:52%; transform:translate(-50%,-50%); width:160px; height:56px; border:2px solid rgba(196,255,77,0.9); border-radius:6px; box-shadow:0 0 0 999px rgba(20,16,31,0.35); }
+  .cam .box::before, .cam .box::after { content:""; position:absolute; width:14px; height:14px; border-color:var(--lime); border-style:solid; }
+  .cam .box::before { left:-2px; top:-2px; border-width:3px 0 0 3px; }
+  .cam .box::after { right:-2px; bottom:-2px; border-width:0 3px 3px 0; }
+  .cam .scanline { position:absolute; left:8%; right:8%; top:20%; height:2px; background:linear-gradient(90deg, transparent, var(--lime), transparent); animation:scan 1.8s ease-in-out infinite; }
+  .cam.found .scanline { display:none; }
+  .cam.found { animation:shake 0.5s ease; }
+  .cam .readout { position:relative; padding:14px; background:linear-gradient(180deg, transparent, rgba(20,16,31,0.9)); display:flex; flex-direction:column; gap:6px; }
+  .cam .readout .r { font-size:12px; color:rgba(255,255,255,0.7); }
+  .cam .readout .v { font-family:var(--serif); font-size:22px; }
+  .cam .readout .v.match { color:var(--lime); }
+  @keyframes scan { 0%{top:20%} 50%{top:80%} 100%{top:20%} }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 40%{transform:translateX(6px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
+  .targets { display:flex; gap:8px; flex-wrap:wrap; }
+  .timer { font-family:var(--serif); font-size:44px; line-height:1; color:var(--ink); }
+
+  .toast { position:absolute; left:16px; right:16px; top:56px; background:var(--white); border:1px solid var(--line); border-left:4px solid var(--primary); border-radius:12px; padding:12px 14px; box-shadow:0 12px 30px -12px rgba(32,19,46,0.4); display:flex; gap:10px; align-items:flex-start; z-index:5; }
+  .toast .mk { width:28px; height:28px; border-radius:6px; flex:0 0 auto; }
+  .toast .t { font-weight:700; color:var(--ink); font-size:13px; }
+  .toast .s { font-size:12px; color:var(--steel); }
+  .toast[hidden] { display:none; }
+
+  .splash { flex:1; background:var(--ink-deep); color:var(--white); display:flex; flex-direction:column; justify-content:center; align-items:center; gap:18px; padding:32px; text-align:center; }
+  .splash .mark { width:96px; height:96px; border-radius:24px; }
+  .splash h1 { margin:0; font-size:32px; font-weight:800; letter-spacing:-0.02em; }
+  .splash .sub { font-family:var(--serif); font-size:16px; color:rgba(255,255,255,0.75); }
+  .splash .kicker { font-size:11px; letter-spacing:0.18em; color:var(--lime); font-weight:700; }
+
+  @media (prefers-reduced-motion: reduce) { .cam .scanline, .cam.found { animation:none; } }
+  @media (max-width: 860px) {
+    .stage { grid-template-columns:1fr; padding-inline:16px; padding-block:16px; gap:16px; }
+    .flow { display:none; }
+    .device { height:740px; border-radius:36px; border-width:6px; }
+    .topbar { padding-inline:16px; }
+  }
+</style>
+
+<div class="shell">
+  <header class="topbar">
+    <div class="brand" id="brand"></div>
+    <div class="meta">MVP1 클릭 프로토타입 · <b>D-015 Screen Map</b> 기준 · 2026-09-10 · 오른쪽에서 <b>고객 앱 / 크루 앱</b> 전환</div>
+    <div class="seg" role="group" aria-label="앱 선택">
+      <button type="button" id="seg-customer" data-app="customer" aria-pressed="true">고객 앱</button>
+      <button type="button" id="seg-crew" data-app="crew" aria-pressed="false">크루 앱</button>
+    </div>
+  </header>
+
+  <main class="stage">
+    <aside class="flow">
+      <h2 id="flow-title">고객 MVP 화면</h2>
+      <ol id="flow-list"></ol>
+      <div class="note" id="flow-note"></div>
+    </aside>
+
+    <div class="device-wrap">
+      <div class="device">
+        <div class="statusbar"><span>9:41</span><div class="notch"></div><span>●●● ⌁</span></div>
+        <div class="toast" id="toast" hidden></div>
+        <div class="screen" id="screen"></div>
+        <nav class="tabbar" id="tabbar" aria-label="하단 탭"></nav>
+      </div>
+      <p class="hint">화면 안의 버튼을 눌러 흐름을 따라가세요. 데이터는 예시입니다.</p>
+    </div>
+  </main>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ---------- Brand mark (D-019 안 A · 열쇠+차) ----------
+  function mark(size, cls) {
+    return '<svg class="' + (cls || 'mark') + '" width="' + size + '" height="' + size + '" viewBox="0 0 140 140" role="img" aria-label="차집사 로고">'
+      + '<rect width="140" height="140" rx="32" fill="#6B3FA0"/>'
+      + '<circle cx="70" cy="42" r="14" fill="none" stroke="#fff" stroke-width="7"/>'
+      + '<rect x="66" y="54" width="8" height="22" fill="#fff"/>'
+      + '<rect x="66" y="66" width="16" height="7" fill="#fff"/>'
+      + '<path d="M40 88 L50 74 H90 L100 88 H112 A6 6 0 0 1 118 94 V108 H22 V94 A6 6 0 0 1 28 88 Z" fill="#fff"/>'
+      + '<circle cx="42" cy="110" r="9" fill="#fff"/><circle cx="98" cy="110" r="9" fill="#fff"/>'
+      + '</svg>';
+  }
+  function carSvg() {
+    return '<svg class="car" viewBox="0 0 190 90" aria-hidden="true"><path d="M20 62 L38 30 H140 L170 62 H182 V78 H8 V62 Z" fill="#9A93B0"/><path d="M48 34 H132 L150 58 H32 Z" fill="#C9C4DA"/><circle cx="44" cy="80" r="11" fill="#2A2438"/><circle cx="146" cy="80" r="11" fill="#2A2438"/></svg>';
+  }
+  var ICON = {
+    home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8v9a2 2 0 0 1-2 2h-4v-6H9v6H5a2 2 0 0 1-2-2z"/></svg>',
+    car: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 16l1.5-5h11L19 16"/><rect x="3" y="16" width="18" height="4" rx="1"/><circle cx="7.5" cy="20" r="1.5"/><circle cx="16.5" cy="20" r="1.5"/></svg>',
+    log: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>',
+    sub: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/></svg>',
+    today: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>',
+    scan: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><path d="M4 12h16"/></svg>',
+    won: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 9l1.5 6L12 9l2.5 6L16 9M7 12h10"/></svg>',
+    back: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
+    chev: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>'
+  };
+
+  // ---------- Example data (D-010 가격 · D-012 Care Calendar · D-007 지급단가) ----------
+  var S = {
+    app: 'customer',
+    screen: 'c-splash',
+    stack: [],
+    customer: {
+      name: '김민준',
+      vehicle: { plate: '12가 3456', model: '현대 아반떼 CN7', color: '흰색', cls: 'sedan', registered: true },
+      location: { type: 'apt', name: '지산동 그린타운', detail: '103동 지하 1층 B-27', access: '공동현관 #1234 · 지하주차장 개방', night: true, registered: true },
+      plan: 'w4',
+      subscribed: true,
+      usage: { included: 4, used: 2 },
+      nextWash: '09-12',
+      lastWash: '09-05',
+      oil: { last: '2026-03-15', next: '2026-09-15' },
+      vehicleClass: 'sedan',
+      rewash: false
+    },
+    crew: {
+      name: '박서준',
+      today: '2026-09-10',
+      batches: [
+        { id: 'b1', name: '지산동 그린타운', kind: '아파트 · 지하주차장', access: '공동현관 #1234', slot: '21:00 – 23:00', wos: ['w1', 'w2', 'w3', 'w4'] },
+        { id: 'b2', name: '범어동 SK오피스', kind: '오피스 · 옥외주차장', access: '경비실 등록 완료', slot: '23:30 – 00:30', wos: ['w5', 'w6'] }
+      ],
+      wos: {
+        w1: { plate: '12가 3456', model: '아반떼 · 흰색', spot: '지하 1층 B-27', memo: '뒷유리 김서림 주의', state: 'done', cls: 'sedan' },
+        w2: { plate: '34나 5678', model: '쏘렌토 · 검정', spot: '지하 1층 B-31', memo: '', state: 'todo', cls: 'suv' },
+        w3: { plate: '78다 1234', model: 'K5 · 회색', spot: '지하 2층 C-08', memo: '오른쪽 뒷문 기존 스크래치', state: 'todo', cls: 'sedan' },
+        w4: { plate: '56라 9012', model: '카니발 · 은색', spot: '지하 2층 C-14', memo: '', state: 'todo', cls: 'suv' },
+        w5: { plate: '90마 3344', model: '그랜저 · 검정', spot: '옥외 A-3', memo: '', state: 'todo', cls: 'sedan' },
+        w6: { plate: '11바 7788', model: '투싼 · 파랑', spot: '옥외 A-9', memo: '', state: 'todo', cls: 'suv' }
+      },
+      currentWo: 'w2',
+      scan: { running: false, found: false, reading: '— — ————', timer: null, manual: '' },
+      work: { started: null, before: false, after: false, finding: '', tick: null }
+    }
+  };
+  var PLANS = {
+    sedan: [{ id: 'once', t: '1회 이용', s: '필요할 때 한 번', price: 29000 }, { id: 'w2', t: '월 2회', s: '격주 정기 케어', price: 39000 }, { id: 'w4', t: '월 4회', s: '주 1회 · Hero Plan', price: 59000, hero: true }],
+    suv: [{ id: 'once', t: '1회 이용', s: '필요할 때 한 번', price: 35000 }, { id: 'w2', t: '월 2회', s: '격주 정기 케어', price: 45000 }, { id: 'w4', t: '월 4회', s: '주 1회 · Hero Plan', price: 69000, hero: true }]
+  };
+  var CREW_PAY = 5000;
+
+  function won(n) { return n.toLocaleString('ko-KR'); }
+  function planOf(c) { var list = PLANS[c.vehicleClass] || PLANS.sedan; for (var i = 0; i < list.length; i++) if (list[i].id === c.plan) return list[i]; return list[2]; }
+
+  // ---------- Screen registry ----------
+  var FLOWS = {
+    customer: [
+      ['c-splash', '로그인 · 가입'], ['c-vehicle', '차량 등록'], ['c-location', '주차 위치 등록'], ['c-plans', '플랜 · 가격'],
+      ['c-pay', '구독 결제'], ['c-home', '홈 · 다음 일정'], ['c-work', '작업 상세 · Before/After'], ['c-cs', '재세차 · 문의'], ['c-manage', '내 차 · 구독 관리']
+    ],
+    crew: [
+      ['k-login', '로그인 · 인증 상태'], ['k-today', '오늘 작업'], ['k-batch', 'Batch 상세'], ['k-wo', 'Work Order 상세'], ['k-scan', '차량 찾기 스캔'],
+      ['k-work', 'Before/After · 타이머'], ['k-issue', '예외 · 이슈 등록'], ['k-done', '작업 완료'], ['k-earn', '수입 · 정산']
+    ]
+  };
+  var NOTES = {
+    customer: '<b>참조</b> D-010 가격 · D-011 자동 정기결제 · D-012 Vehicle Care Calendar · D-014 Usage Ledger · D-023 세차+엔진오일 범위',
+    crew: '<b>참조</b> D-007 지급단가 5,000원 검증 · D-016 Evidence(기존손상 분리) · CJ-APP-SPEC-CAMERA-OCR-001 차량 탐색 모드 · 수동 입력 폴백 유지'
+  };
+  var TABS = {
+    customer: [['c-home', '홈', 'home'], ['c-manage', '내 차', 'car'], ['c-work', '케어 기록', 'log'], ['c-plans', '구독', 'sub']],
+    crew: [['k-today', '오늘', 'today'], ['k-scan', '차량찾기', 'scan'], ['k-earn', '수입', 'won']]
+  };
+  var NO_TAB = { 'c-splash': 1, 'c-vehicle': 1, 'c-location': 1, 'c-pay': 1, 'k-login': 1 };
+
+  function head(title, opts) {
+    opts = opts || {};
+    return '<div class="apphead">'
+      + (opts.back ? '<button type="button" class="back" data-back aria-label="뒤로">' + ICON.back + '</button>' : '')
+      + '<h1>' + title + '</h1>'
+      + (opts.right ? '<span class="right">' + opts.right + '</span>' : '')
+      + '</div>';
+  }
+
+  // ---------- Customer screens ----------
+  var R = {};
+
+  R['c-splash'] = function () {
+    return '<div class="splash">' + mark(96) + '<div><div class="kicker">VEHICLE CARE CONCIERGE</div><h1>차집사</h1><div class="sub">내 차를 대신 기억합니다</div></div>'
+      + '<div class="stack" style="width:100%;margin-top:24px">'
+      + '<button type="button" class="btn purple" data-go="c-vehicle">휴대폰 번호로 시작하기</button>'
+      + '<button type="button" class="btn" style="background:rgba(255,255,255,0.08);color:#fff" data-go="c-home">이미 가입했어요 · 로그인</button>'
+      + '<p class="small" style="color:rgba(255,255,255,0.5);margin:6px 0 0">카카오 로그인 · 본인인증은 PG·인증사 선정 후 연결 (Pending)</p>'
+      + '</div></div>';
+  };
+
+  R['c-vehicle'] = function () {
+    var c = S.customer;
+    return '<div class="page">' + head('내 차를 알려주세요', { back: true, right: '1 / 3' })
+      + '<p class="muted" style="margin:0">차량 정보와 주차 위치만 입력하면 됩니다.</p>'
+      + '<div class="field"><label for="f-plate">차량번호</label><input class="input" id="f-plate" value="' + c.vehicle.plate + '" placeholder="12가 3456"></div>'
+      + '<div class="field"><label for="f-model">차종</label><input class="input" id="f-model" value="' + c.vehicle.model + '" placeholder="예: 현대 아반떼"></div>'
+      + '<div class="field"><label>차량 구분 <span class="small">(가격 기준 · D-010)</span></label><div class="choice">'
+      + '<button type="button" data-act="cls" data-v="sedan" aria-pressed="' + (c.vehicleClass === 'sedan') + '">승용 · 중형 이하</button>'
+      + '<button type="button" data-act="cls" data-v="suv" aria-pressed="' + (c.vehicleClass === 'suv') + '">SUV · 대형</button>'
+      + '</div></div>'
+      + '<div class="field"><label for="f-color">색상</label><input class="input" id="f-color" value="' + c.vehicle.color + '"></div>'
+      + '<div style="margin-top:auto"><button type="button" class="btn primary" data-go="c-location">다음 <span class="arrow">→</span></button></div>'
+      + '</div>';
+  };
+
+  R['c-location'] = function () {
+    var l = S.customer.location;
+    return '<div class="page">' + head('어디에 주차하세요?', { back: true, right: '2 / 3' })
+      + '<p class="muted" style="margin:0">집사님이 찾아갈 곳이에요. 아파트·주택·오피스 어디든 됩니다.</p>'
+      + '<div class="choice">'
+      + '<button type="button" aria-pressed="true">아파트</button><button type="button">주택</button><button type="button">오피스</button><button type="button">법인 주차장</button>'
+      + '</div>'
+      + '<div class="field"><label for="f-loc">장소</label><input class="input" id="f-loc" value="' + l.name + '"></div>'
+      + '<div class="field"><label for="f-spot">동 · 주차 위치</label><input class="input" id="f-spot" value="' + l.detail + '"></div>'
+      + '<div class="field"><label for="f-access">출입 방법</label><input class="input" id="f-access" value="' + l.access + '"></div>'
+      + '<div class="card tight"><div class="row between"><div><div class="h2" style="font-size:14px">야간 작업 가능</div><div class="small">밤에 주차돼 있을 때 방문해도 괜찮아요</div></div><span class="pill success">허용</span></div></div>'
+      + '<p class="small" style="margin:0">관리사무소 사전 확인은 기본 절차가 아닙니다. 출입 거부 등 예외 시에만 연락드려요. (D-008)</p>'
+      + '<div style="margin-top:auto"><button type="button" class="btn primary" data-go="c-plans">플랜 고르기 <span class="arrow">→</span></button></div>'
+      + '</div>';
+  };
+
+  R['c-plans'] = function () {
+    var c = S.customer; var list = PLANS[c.vehicleClass];
+    var html = '<div class="page">' + head('내 차에 맞는 플랜', { back: !c.subscribed, right: c.subscribed ? '' : '3 / 3' })
+      + '<div class="row between"><span class="pill purple">' + (c.vehicleClass === 'suv' ? 'SUV · 대형' : '승용 · 중형 이하') + '</span><button type="button" class="btn sm line" data-act="togglecls">차량 구분 변경</button></div>'
+      + '<div class="plans">';
+    list.forEach(function (p) {
+      html += '<button type="button" class="plan" data-act="plan" data-v="' + p.id + '" aria-pressed="' + (c.plan === p.id) + '">'
+        + '<div class="grow"><div class="row" style="gap:8px"><span class="t">' + p.t + '</span>' + (p.hero ? '<span class="pill lime"><i class="dot lime"></i>가장 많이 선택</span>' : '') + '</div><div class="s">' + p.s + '</div></div>'
+        + '<div class="price">' + won(p.price) + '<small> 원' + (p.id === 'once' ? '' : '/월') + '</small></div>'
+        + '</button>';
+    });
+    html += '</div>'
+      + '<div class="card soft"><div class="h2" style="font-size:14px">월 정기 플랜에 포함</div><div class="small" style="color:var(--steel)">자동 정기결제 · 관리 일정 자동 생성 · Before/After 리포트 · 차량 상태 알림 · 앱에서 간단 해지</div></div>'
+      + '<div style="margin-top:auto">' + (c.subscribed
+        ? '<button type="button" class="btn ghost" data-go="c-manage">현재 구독 관리</button>'
+        : '<button type="button" class="btn primary" data-go="c-pay">' + planOf(c).t + ' 시작하기 <span class="arrow">→</span></button>')
+      + '</div></div>';
+    return html;
+  };
+
+  R['c-pay'] = function () {
+    var c = S.customer; var p = planOf(c);
+    return '<div class="page">' + head('결제', { back: true })
+      + '<div class="card dark"><div class="small">첫 결제</div><div class="row between"><div class="h2" style="color:#fff">' + p.t + ' · ' + (c.vehicleClass === 'suv' ? 'SUV' : '승용') + '</div><div class="num" style="font-size:26px">' + won(p.price) + '<span class="small"> 원</span></div></div>'
+      + '<div class="small">다음 결제일 10월 10일 · 매월 자동결제 · 언제든 앱에서 해지</div></div>'
+      + '<div class="field"><label>결제 수단</label><div class="list card tight" style="gap:0;padding-block:4px">'
+      + '<button type="button" class="item"><span class="pill purple">카드</span><div class="grow"><div class="t">신한카드 ····1234</div><div class="s">정기결제 등록</div></div><span class="pill success">선택</span></button>'
+      + '<button type="button" class="item"><span class="pill neutral">간편</span><div class="grow"><div class="t">카카오페이 · 네이버페이</div><div class="s">PG 선정 후 연결 (Pending)</div></div><span class="chev">' + ICON.chev + '</span></button>'
+      + '</div></div>'
+      + '<dl class="kv"><dt>이용 회차</dt><dd>이번 달 ' + (p.id === 'once' ? 1 : (p.id === 'w2' ? 2 : 4)) + '회 · 미사용분은 기간 내 재예약</dd><dt>일정 변경</dt><dd>회차 차감 없이 이동</dd><dt>회사 귀책</dt><dd>날씨 보류·미배정 시 회차 보전</dd></dl>'
+      + '<div style="margin-top:auto" class="stack"><button type="button" class="btn primary" data-act="subscribe">' + won(p.price) + '원 결제하고 시작 <span class="arrow">→</span></button><p class="small" style="margin:0;text-align:center">결제 시 이용약관·개인정보 처리방침에 동의합니다</p></div>'
+      + '</div>';
+  };
+
+  function calendar() {
+    // 2026-09: Sept 1 is Tuesday
+    var cells = '<div class="d dim">일</div><div class="d dim">월</div><div class="d dim">화</div><div class="d dim">수</div><div class="d dim">목</div><div class="d dim">금</div><div class="d dim">토</div>';
+    var offset = 2; for (var i = 0; i < offset; i++) cells += '<div class="d"></div>';
+    var wash = { 5: 1, 12: 1, 19: 1, 26: 1 }, oil = { 15: 1 };
+    for (var d = 1; d <= 30; d++) {
+      var cls = 'd' + (d === 10 ? ' today' : '') + (wash[d] ? ' wash' : '') + (oil[d] ? ' oil' : '');
+      cells += '<div class="' + cls + '">' + d + '</div>';
+    }
+    return '<div class="cal">' + cells + '</div><div class="legend"><span><i style="background:var(--primary)"></i>세차</span><span><i style="background:var(--warning)"></i>엔진오일 권장</span><span><i style="background:var(--lime)"></i>오늘</span></div>';
+  }
+
+  R['c-home'] = function () {
+    var c = S.customer; var p = planOf(c);
+    return '<div class="page">'
+      + '<div class="apphead">' + mark(28) + '<div><div class="small">' + c.name + '님의 차</div><div class="h2">' + c.vehicle.plate + ' · ' + c.vehicle.model.split(' ')[1] + '</div></div><span class="right"><span class="pill success"><i class="dot"></i>관리 중</span></span></div>'
+      + '<div class="card dark">'
+      + '<div class="row between"><div class="small">다음 세차</div><span class="pill" style="background:rgba(255,255,255,0.12);color:#fff">' + p.t + '</span></div>'
+      + '<div class="row" style="align-items:baseline;gap:12px"><div class="num" style="font-size:40px;line-height:1">D-2</div><div><div style="font-weight:700">9월 12일 (토) 밤</div><div class="small">' + c.location.name + ' ' + c.location.detail + '</div></div></div>'
+      + '<div class="row between" style="margin-top:4px"><div class="small">이번 달 ' + c.usage.used + ' / ' + c.usage.included + '회 사용</div><button type="button" class="btn sm" style="background:rgba(255,255,255,0.1);color:#fff" data-go="c-manage">일정 변경</button></div>'
+      + '</div>'
+      + '<div class="card"><div class="row between"><div class="h2">이번 달 관리</div><span class="small">9월</span></div>' + calendar() + '</div>'
+      + '<div class="card" style="border-left:4px solid var(--warning);border-radius:0 var(--r-lg) var(--r-lg) 0"><div class="row between"><div><div class="h2" style="font-size:14px">엔진오일 교체 권장</div><div class="small">마지막 3월 15일 · 권장 9월 15일 (D-5)</div></div><span class="pill warning">D-5</span></div>'
+      + '<div class="btnrow"><button type="button" class="btn sm soft" data-act="oil-book">예약 요청</button><button type="button" class="btn sm line" data-act="oil-done">직접 교체했어요</button></div>'
+      + '<p class="small" style="margin:0">정확한 날짜를 몰라도 괜찮아요. "대략"도 기록됩니다. (D-013)</p></div>'
+      + '<div class="card"><div class="row between"><div class="h2">최근 케어</div><button type="button" class="btn sm line" data-go="c-work">전체 기록</button></div>'
+      + '<button type="button" class="list item" data-go="c-work" style="padding-block:4px"><span class="pill success">완료</span><div class="grow"><div class="t">9월 5일 · 세차 완료</div><div class="s">집사 박서준 · 사진 4장 · 이상 소견 1건</div></div><span class="chev">' + ICON.chev + '</span></button></div>'
+      + '</div>';
+  };
+
+  R['c-work'] = function () {
+    return '<div class="page">' + head('9월 5일 세차', { back: true, right: '21:42 – 22:08' })
+      + '<div class="row"><span class="pill success"><i class="dot"></i>완료</span><span class="pill neutral">집사 박서준</span><span class="pill neutral">26분</span></div>'
+      + '<div class="photos"><div class="photo before"><span class="tag">Before</span>21:42</div><div class="photo after"><span class="tag">After</span>22:08</div></div>'
+      + '<div class="card"><div class="h2">케어 리포트</div>'
+      + '<dl class="kv"><dt>작업</dt><dd>외부 세차 · 유리 · 휠 · 타이어 광택</dd><dt>주차 위치</dt><dd>지하 1층 B-27 (기록됨)</dd><dt>이상 소견</dt><dd>오른쪽 앞 타이어 마모 관찰 · 전문 점검 권장</dd></dl>'
+      + '<p class="small" style="margin:0">집사님의 소견은 전문 진단이 아닌 관찰 기록입니다. 필요 시 정비 연결을 도와드려요.</p></div>'
+      + '<div class="card"><div class="h2">차량 케어 기록</div><div class="list">'
+      + '<div class="item"><span class="pill purple">세차</span><div class="grow"><div class="t">9월 5일</div><div class="s">실제 수행 · 증빙 사진</div></div></div>'
+      + '<div class="item"><span class="pill purple">세차</span><div class="grow"><div class="t">8월 29일</div><div class="s">실제 수행 · 증빙 사진</div></div></div>'
+      + '<div class="item"><span class="pill warning">오일</span><div class="grow"><div class="t">3월 15일 (대략)</div><div class="s">고객 대략 입력</div></div></div>'
+      + '</div></div>'
+      + '<div class="btnrow"><button type="button" class="btn ghost" data-go="c-cs">세차 상태가 아쉬워요</button></div>'
+      + '</div>';
+  };
+
+  R['c-cs'] = function () {
+    var c = S.customer;
+    if (c.rewash) {
+      return '<div class="page">' + head('접수 완료', { back: true })
+        + '<div class="card" style="align-items:center;text-align:center;gap:8px"><span class="pill success" style="font-size:13px"><i class="dot"></i>무료 재세차 접수</span><div class="h2">48시간 안에 다시 방문할게요</div><p class="small" style="margin:0">회차는 차감되지 않습니다. 접수번호 RW-260910-01</p></div>'
+        + '<button type="button" class="btn primary" data-go="c-home">홈으로</button></div>';
+    }
+    return '<div class="page">' + head('세차 상태가 아쉬워요', { back: true })
+      + '<p class="muted" style="margin:0">품질 문제는 회차 차감 없이 무료로 다시 세차해 드려요. (D-014)</p>'
+      + '<div class="choice"><button type="button" aria-pressed="true">얼룩이 남았어요</button><button type="button">유리가 뿌예요</button><button type="button">휠·타이어</button><button type="button">기타</button></div>'
+      + '<div class="field"><label for="f-cs">설명 (선택)</label><textarea class="input" id="f-cs" rows="3" placeholder="어느 부분이 아쉬웠는지 알려주세요"></textarea></div>'
+      + '<button type="button" class="photo before" style="aspect-ratio:16/7">사진 첨부 (선택)</button>'
+      + '<div style="margin-top:auto" class="stack"><button type="button" class="btn primary" data-act="rewash">무료 재세차 신청</button><button type="button" class="btn line">차량 손상 · 사고 접수 (별도)</button></div>'
+      + '</div>';
+  };
+
+  R['c-manage'] = function () {
+    var c = S.customer; var p = planOf(c);
+    return '<div class="page">' + head('내 차 · 구독')
+      + '<div class="card"><div class="row between"><div><div class="h2">' + c.vehicle.plate + '</div><div class="small">' + c.vehicle.model + ' · ' + c.vehicle.color + '</div></div>' + mark(40) + '</div>'
+      + '<dl class="kv"><dt>주차 위치</dt><dd>' + c.location.name + '<br>' + c.location.detail + '</dd><dt>출입</dt><dd>' + c.location.access + '</dd></dl>'
+      + '<div class="btnrow"><button type="button" class="btn sm line" data-go="c-location">위치 수정</button><button type="button" class="btn sm line">차량 추가</button></div></div>'
+      + '<div class="card reco"><div class="row between"><div><div class="h2">' + p.t + ' 구독 중</div><div class="small">다음 결제 10월 10일 · ' + won(p.price) + '원</div></div><span class="pill success">ACTIVE</span></div>'
+      + '<div class="row" style="gap:6px">' + [1, 2, 3, 4].map(function (i) { return '<span class="pill ' + (i <= c.usage.used ? 'purple' : 'neutral') + '">' + i + '회' + (i <= c.usage.used ? ' ✓' : '') + '</span>'; }).join('') + '</div>'
+      + '<div class="list">'
+      + '<button type="button" class="item"><div class="grow"><div class="t">다음 세차 일정 변경</div><div class="s">9월 12일 → 원하는 날짜로 이동 · 회차 차감 없음</div></div><span class="chev">' + ICON.chev + '</span></button>'
+      + '<button type="button" class="item" data-go="c-plans"><div class="grow"><div class="t">플랜 변경</div><div class="s">월 2회 ↔ 월 4회</div></div><span class="chev">' + ICON.chev + '</span></button>'
+      + '<button type="button" class="item"><div class="grow"><div class="t">일시정지</div><div class="s">장기 출장·차량 없을 때</div></div><span class="chev">' + ICON.chev + '</span></button>'
+      + '<button type="button" class="item"><div class="grow"><div class="t" style="color:var(--danger-800)">해지</div><div class="s">이번 결제 기간 끝까지 이용 후 종료</div></div><span class="chev">' + ICON.chev + '</span></button>'
+      + '</div></div>'
+      + '<div class="card tight"><div class="list">'
+      + '<button type="button" class="item"><div class="grow"><div class="t">결제 수단 · 내역</div></div><span class="chev">' + ICON.chev + '</span></button>'
+      + '<button type="button" class="item"><div class="grow"><div class="t">알림 설정</div><div class="s">작업 시작·완료 Push · 관리 권장 알림</div></div><span class="chev">' + ICON.chev + '</span></button>'
+      + '<button type="button" class="item" data-go="c-cs"><div class="grow"><div class="t">문의 · 재세차</div></div><span class="chev">' + ICON.chev + '</span></button>'
+      + '</div></div></div>';
+  };
+
+  // ---------- Crew screens ----------
+  R['k-login'] = function () {
+    return '<div class="splash">' + mark(96) + '<div><div class="kicker">CARE CREW</div><h1>차집사 크루</h1><div class="sub">오늘도 잘 부탁드려요</div></div>'
+      + '<div class="card" style="width:100%;text-align:left;color:var(--ink)"><div class="row between"><div><div class="h2">' + S.crew.name + ' 집사</div><div class="small">Level 1 · 교육 이수 · QA 4.9</div></div><span class="pill success"><i class="dot"></i>활동 가능</span></div>'
+      + '<dl class="kv"><dt>Crew Kit</dt><dd>지급 완료 · 점검 9/8</dd><dt>권역</dt><dd>수성구 · 야간</dd></dl></div>'
+      + '<button type="button" class="btn purple" data-go="k-today">오늘 작업 시작</button></div>';
+  };
+
+  function woState(w) {
+    return w.state === 'done' ? '<span class="pill success">완료</span>' : (w.state === 'working' ? '<span class="pill lime"><i class="dot lime"></i>작업 중</span>' : (w.state === 'issue' ? '<span class="pill danger">이슈</span>' : '<span class="pill neutral">예정</span>'));
+  }
+  function countDone() { var n = 0; Object.keys(S.crew.wos).forEach(function (k) { if (S.crew.wos[k].state === 'done') n++; }); return n; }
+
+  R['k-today'] = function () {
+    var k = S.crew; var total = 6; var done = countDone();
+    var html = '<div class="page">'
+      + '<div class="apphead">' + mark(28) + '<div><div class="small">9월 10일 (목)</div><div class="h2">' + k.name + ' 집사님, 오늘 밤</div></div></div>'
+      + '<div class="card dark"><div class="row" style="gap:24px">'
+      + '<div><div class="small">작업 차량</div><div class="num" style="font-size:32px">' + done + '<span style="font-size:18px;opacity:0.6"> / ' + total + '</span></div></div>'
+      + '<div><div class="small">예상 수입</div><div class="num" style="font-size:32px">' + won(total * CREW_PAY) + '<span class="small"> 원</span></div></div>'
+      + '<div><div class="small">시작</div><div class="num" style="font-size:32px">21:00</div></div>'
+      + '</div><div class="small">기본 지급 대당 ' + won(CREW_PAY) + '원 · 재세차는 지급에서 차감하지 않고 품질 데이터로만 분리</div></div>'
+      + '<div class="row between"><div class="h2">Batch 2건</div><span class="small">이동 순서대로</span></div>';
+    k.batches.forEach(function (b, i) {
+      var d = 0; b.wos.forEach(function (id) { if (k.wos[id].state === 'done') d++; });
+      html += '<button type="button" class="card" style="text-align:left;color:inherit;cursor:pointer" data-act="batch" data-v="' + b.id + '">'
+        + '<div class="row between"><div class="row" style="gap:8px"><span class="num" style="color:var(--p400)">' + (i + 1) + '</span><div class="h2">' + b.name + '</div></div><span class="pill ' + (d === b.wos.length ? 'success' : 'purple') + '">' + d + ' / ' + b.wos.length + '대</span></div>'
+        + '<div class="small">' + b.kind + ' · ' + b.slot + ' · ' + b.access + '</div>'
+        + '</button>';
+    });
+    html += '<button type="button" class="btn ghost" data-go="k-scan">차량 찾기 스캔 열기</button></div>';
+    return html;
+  };
+
+  R['k-batch'] = function () {
+    var k = S.crew; var b = k.batches[0]; k.batches.forEach(function (x) { if (x.id === k.currentBatch) b = x; });
+    var html = '<div class="page">' + head(b.name, { back: true, right: b.slot })
+      + '<div class="card tight"><dl class="kv"><dt>유형</dt><dd>' + b.kind + '</dd><dt>출입</dt><dd>' + b.access + '</dd><dt>예상 완료</dt><dd>' + b.wos.length + '대 · 약 ' + (b.wos.length * 25) + '분</dd></dl></div>'
+      + '<div class="h2">작업 순서</div><div class="card tight" style="gap:0;padding-block:4px"><div class="list">';
+    b.wos.forEach(function (id, i) {
+      var w = k.wos[id];
+      html += '<button type="button" class="item" data-act="wo" data-v="' + id + '"><span class="num" style="color:var(--p400);min-width:16px">' + (i + 1) + '</span><div class="grow"><div class="t">' + w.plate + ' · ' + w.model + '</div><div class="s">' + w.spot + (w.memo ? ' · ' + w.memo : '') + '</div></div>' + woState(w) + '</button>';
+    });
+    html += '</div></div><button type="button" class="btn primary" data-go="k-scan">이 Batch 차량 찾기 <span class="arrow">→</span></button></div>';
+    return html;
+  };
+
+  R['k-wo'] = function () {
+    var k = S.crew; var w = k.wos[k.currentWo];
+    return '<div class="page">' + head(w.plate, { back: true, right: w.model })
+      + '<div class="row">' + woState(w) + '<span class="pill neutral">' + (w.cls === 'suv' ? 'SUV · 대형' : '승용') + '</span></div>'
+      + '<div class="card"><dl class="kv"><dt>주차 위치</dt><dd>' + w.spot + '<br><span class="small">고객 최근 주차 기록 9/10 20:12</span></dd><dt>고객 요청</dt><dd>' + (w.memo || '없음') + '</dd><dt>플랜</dt><dd>월 4회 · 이번 달 3회차</dd></dl></div>'
+      + '<div class="card soft"><div class="h2" style="font-size:14px">작업 전 확인</div><div class="stack" style="font-size:13px;color:var(--steel)"><div>✓ 번호판 일치 확인 (스캔 또는 수동)</div><div>✓ Before 사진 3장 이상</div><div>✓ 기존 손상은 별도 체크 (품질 이슈와 분리)</div></div></div>'
+      + '<div style="margin-top:auto" class="stack"><button type="button" class="btn primary" data-act="scan-for" data-v="' + k.currentWo + '">차량 찾기 스캔 <span class="arrow">→</span></button><button type="button" class="btn line" data-act="start-work" data-v="' + k.currentWo + '">이미 찾았어요 · 바로 시작</button><button type="button" class="btn ghost" data-go="k-issue">차량 없음 · 이슈 등록</button></div>'
+      + '</div>';
+  };
+
+  var DECOYS = ['34나 5678', '81호 2210', '45러 0931', '27수 6604', '13구 8842'];
+  R['k-scan'] = function () {
+    var k = S.crew; var sc = k.scan; var w = k.wos[k.currentWo];
+    var targets = Object.keys(k.wos).filter(function (id) { return k.wos[id].state !== 'done'; });
+    var html = '<div class="page">' + head('차량 찾기', { back: true, right: '탐색 ' + targets.length + '대' })
+      + '<div class="cam' + (sc.found ? ' found' : '') + '"><div class="grid"></div>' + carSvg()
+      + '<div class="plate">' + (sc.found ? w.plate : sc.reading) + '</div>'
+      + (sc.running || sc.found ? '<div class="box"></div><div class="scanline"></div>' : '')
+      + '<div class="readout"><div class="r">' + (sc.found ? '등록 차량 발견 · 정확 일치' : (sc.running ? '번호판 인식 중… 카메라를 차량 정면으로' : '스캔을 시작하면 주차장을 훑으며 등록 차량을 찾습니다')) + '</div><div class="v' + (sc.found ? ' match' : '') + '">' + (sc.found ? w.plate : sc.reading) + '</div></div></div>';
+    if (sc.found) {
+      html += '<div class="card" style="border-left:4px solid var(--lime);border-radius:0 var(--r-lg) var(--r-lg) 0"><div class="row between"><div><div class="h2">' + w.plate + ' · ' + w.model + '</div><div class="small">' + w.spot + ' · 발견 21:07</div></div><span class="pill lime"><i class="dot lime"></i>일치</span></div>'
+        + '<div class="btnrow"><button type="button" class="btn primary" data-act="start-work" data-v="' + k.currentWo + '">세차 시작</button><button type="button" class="btn line" data-act="scan-reset">다시 찾기</button></div>'
+        + '<p class="small" style="margin:0">고객에게 "세차가 시작되었습니다" Push가 자동 발송됩니다.</p></div>';
+    } else {
+      html += '<div class="targets">' + targets.map(function (id) { return '<span class="pill ' + (id === k.currentWo ? 'purple' : 'neutral') + '">' + k.wos[id].plate + '</span>'; }).join('') + '</div>'
+        + (sc.running
+          ? '<button type="button" class="btn line" data-act="scan-stop">스캔 중지</button>'
+          : '<button type="button" class="btn primary" data-act="scan-start">스캔 시작 <span class="arrow">→</span></button>')
+        + '<div class="card tight"><div class="h2" style="font-size:14px">수동 입력 (폴백)</div><div class="row"><input class="input" id="f-manual" placeholder="번호판 직접 입력 · 예 34나 5678" value="' + sc.manual + '"><button type="button" class="btn sm soft" data-act="scan-manual">확인</button></div><p class="small" style="margin:0">야간·지하주차장 등 인식이 어려울 때 사용. 유사 번호는 "확인 필요"로 표시됩니다.</p></div>';
+    }
+    return html + '</div>';
+  };
+
+  function elapsed() { if (!S.crew.work.started) return '00:00'; var s = Math.floor((Date.now() - S.crew.work.started) / 1000); var m = Math.floor(s / 60); s = s % 60; return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s; }
+  R['k-work'] = function () {
+    var k = S.crew; var w = k.wos[k.currentWo]; var wk = k.work;
+    return '<div class="page">' + head(w.plate + ' 작업', { back: true, right: w.spot })
+      + '<div class="card" style="align-items:center;text-align:center;gap:4px"><div class="small">작업 시간</div><div class="timer" id="timer">' + elapsed() + '</div><div class="small">기준 20 – 30분 · 고객에게는 노출하지 않음 (D-006)</div></div>'
+      + '<div class="h2">현장 증빙</div>'
+      + '<div class="photos">'
+      + '<button type="button" class="photo before" data-act="shot" data-v="before"><span class="tag">Before</span>' + (wk.before ? '' : '촬영') + (wk.before ? '<span class="shot">3장 ✓</span>' : '') + '</button>'
+      + '<button type="button" class="photo after" data-act="shot" data-v="after" ' + (wk.before ? '' : 'disabled') + '><span class="tag">After</span>' + (wk.after ? '' : '촬영') + (wk.after ? '<span class="shot">3장 ✓</span>' : '') + '</button>'
+      + '</div>'
+      + '<div class="card tight"><div class="row between"><div class="h2" style="font-size:14px">기존 손상 체크</div><span class="pill neutral">품질 이슈와 분리</span></div><div class="choice"><button type="button" aria-pressed="' + (w.memo.indexOf('스크래치') >= 0) + '">스크래치</button><button type="button">찍힘 · 덴트</button><button type="button">유리 손상</button><button type="button">없음</button></div></div>'
+      + '<div class="card tight"><div class="h2" style="font-size:14px">차량 상태 소견 <span class="small">(관찰 기록)</span></div><div class="choice"><button type="button" data-act="finding" data-v="타이어 마모" aria-pressed="' + (wk.finding === '타이어 마모') + '">타이어 마모</button><button type="button" data-act="finding" data-v="와이퍼 교체" aria-pressed="' + (wk.finding === '와이퍼 교체') + '">와이퍼 교체</button><button type="button" data-act="finding" data-v="엔진오일 확인" aria-pressed="' + (wk.finding === '엔진오일 확인') + '">엔진오일 확인</button><button type="button" data-act="finding" data-v="" aria-pressed="' + (wk.finding === '') + '">특이사항 없음</button></div></div>'
+      + '<div style="margin-top:auto" class="stack"><button type="button" class="btn primary" data-act="finish" ' + (wk.after ? '' : 'disabled') + '>작업 완료 처리 <span class="arrow">→</span></button><button type="button" class="btn ghost" data-go="k-issue">Basic 불가 · 이슈 등록</button></div>'
+      + '</div>';
+  };
+
+  R['k-issue'] = function () {
+    var w = S.crew.wos[S.crew.currentWo];
+    return '<div class="page">' + head('이슈 등록', { back: true, right: w.plate })
+      + '<p class="muted" style="margin:0">현장에서 일어난 일은 앱에 기록돼야 완료로 인정됩니다. 고객 회차는 회사 귀책이면 보전됩니다.</p>'
+      + '<div class="stack">'
+      + ['차량 없음 (Vehicle Not Found)', '위치 불명 · 출입 불가', '과도한 오염 · Basic 불가', '사고 · 파손 의심', '고객 요청 예외', '날씨 보류'].map(function (t, i) {
+        return '<button type="button" class="card tight" style="text-align:left;color:inherit;flex-direction:row;align-items:center;gap:12px" data-act="issue" data-v="' + t + '"><div class="grow" style="flex:1;font-weight:700">' + t + '</div><span class="chev" style="color:var(--neutral)">' + ICON.chev + '</span></button>';
+      }).join('')
+      + '</div>'
+      + '<button type="button" class="photo before" style="aspect-ratio:16/6">현장 사진 첨부</button>'
+      + '</div>';
+  };
+
+  R['k-done'] = function () {
+    var k = S.crew; var w = k.wos[k.currentWo];
+    return '<div class="page">' + head('작업 완료')
+      + '<div class="card dark" style="align-items:center;text-align:center;gap:8px">' + mark(56) + '<div class="h2" style="color:#fff">' + w.plate + ' 완료</div><div class="small">고객에게 완료 Push · 리포트 자동 게시 · AS 안내 발송</div><div class="num" style="font-size:28px;color:var(--lime)">+ ' + won(CREW_PAY) + '원</div></div>'
+      + '<div class="card"><div class="h2">Vehicle Care Record 반영</div><dl class="kv"><dt>세차</dt><dd>실제 수행 · 증빙 6장 · ' + elapsed() + '</dd><dt>소견</dt><dd>' + (k.work.finding || '특이사항 없음') + '</dd><dt>Usage</dt><dd>고객 3회차 소진 · 다음 일정 9/19 자동 생성</dd></dl></div>'
+      + '<div class="stack"><button type="button" class="btn primary" data-act="next-wo">다음 차량 찾기 <span class="arrow">→</span></button><button type="button" class="btn line" data-go="k-today">오늘 작업으로</button></div>'
+      + '</div>';
+  };
+
+  R['k-earn'] = function () {
+    var done = countDone();
+    return '<div class="page">' + head('수입 · 정산')
+      + '<div class="card dark"><div class="small">이번 주 지급 예정 (9/8 – 9/14)</div><div class="num" style="font-size:36px">' + won((22 + done) * CREW_PAY) + '<span class="small"> 원</span></div><div class="row" style="gap:20px"><div><div class="small">완료</div><div class="num" style="font-size:20px">' + (22 + done) + '대</div></div><div><div class="small">기본 단가</div><div class="num" style="font-size:20px">' + won(CREW_PAY) + '</div></div><div><div class="small">Batch 보너스</div><div class="num" style="font-size:20px">검증 중</div></div></div></div>'
+      + '<div class="card"><div class="row between"><div class="h2">품질 지표</div><span class="small">지급과 분리 · 데이터로만</span></div><div class="row" style="gap:20px"><div><div class="small">QA 점수</div><div class="num" style="font-size:22px">4.9</div></div><div><div class="small">재세차율</div><div class="num" style="font-size:22px">1.2%</div></div><div><div class="small">시간당</div><div class="num" style="font-size:22px">2.4대</div></div></div></div>'
+      + '<div class="card tight"><div class="list">'
+      + '<div class="item"><div class="grow"><div class="t">9월 10일 (오늘)</div><div class="s">' + done + '대 완료 · 진행 중</div></div><span class="num">' + won(done * CREW_PAY) + '</span></div>'
+      + '<div class="item"><div class="grow"><div class="t">9월 9일</div><div class="s">7대 · 지산동 · 범어동</div></div><span class="num">35,000</span></div>'
+      + '<div class="item"><div class="grow"><div class="t">9월 8일</div><div class="s">8대 · 지산동</div></div><span class="num">40,000</span></div>'
+      + '</div></div>'
+      + '<p class="small" style="margin:0">단가는 5,000원부터 검증하며 500원 단위로 조정합니다. (D-007)</p>'
+      + '</div>';
+  };
+
+  // ---------- Actions ----------
+  var toastTimer = null;
+  function toast(t, s) {
+    var el = document.getElementById('toast');
+    el.innerHTML = mark(28, 'mk') + '<div><div class="t">' + t + '</div><div class="s">' + s + '</div></div>';
+    el.hidden = false;
+    clearTimeout(toastTimer); toastTimer = setTimeout(function () { el.hidden = true; }, 3200);
+  }
+  function stopScan() { var sc = S.crew.scan; if (sc.timer) clearInterval(sc.timer); sc.timer = null; sc.running = false; }
+  function startScan() {
+    var sc = S.crew.scan; stopScan(); sc.found = false; sc.running = true; var n = 0;
+    var target = S.crew.wos[S.crew.currentWo].plate;
+    sc.timer = setInterval(function () {
+      n++;
+      if (n >= 4) { stopScan(); sc.found = true; sc.reading = target; render(); return; }
+      sc.reading = DECOYS[(n + Math.floor(Math.random() * 2)) % DECOYS.length];
+      var pl = document.querySelector('.cam .plate'), rd = document.querySelector('.cam .readout .v');
+      if (pl) pl.textContent = sc.reading; if (rd) rd.textContent = sc.reading;
+    }, 900);
+  }
+  function stopTick() { if (S.crew.work.tick) clearInterval(S.crew.work.tick); S.crew.work.tick = null; }
+
+  var ACT = {
+    cls: function (v) { S.customer.vehicleClass = v; },
+    togglecls: function () { S.customer.vehicleClass = S.customer.vehicleClass === 'suv' ? 'sedan' : 'suv'; },
+    plan: function (v) { S.customer.plan = v; },
+    subscribe: function () { S.customer.subscribed = true; go('c-home', true); toast('결제 완료', planOf(S.customer).t + ' 구독이 시작됐어요. 첫 세차 일정을 잡았습니다.'); return true; },
+    'oil-book': function () { toast('예약 요청 접수', '엔진오일 교체 가능한 시간을 곧 안내드릴게요.'); },
+    'oil-done': function () { S.customer.oil.last = '2026-09-10'; toast('기록됐어요', '엔진오일 · 오늘 · 고객 입력. 다음 권장일을 다시 계산했습니다.'); },
+    rewash: function () { S.customer.rewash = true; },
+    batch: function (v) { S.crew.currentBatch = v; go('k-batch'); return true; },
+    wo: function (v) { S.crew.currentWo = v; go('k-wo'); return true; },
+    'scan-for': function (v) { S.crew.currentWo = v; S.crew.scan.found = false; S.crew.scan.reading = '— — ————'; go('k-scan'); startScan(); return true; },
+    'scan-start': function () { startScan(); },
+    'scan-stop': function () { stopScan(); },
+    'scan-reset': function () { stopScan(); S.crew.scan.found = false; S.crew.scan.reading = '— — ————'; },
+    'scan-manual': function () {
+      var v = (document.getElementById('f-manual') || {}).value || ''; v = v.replace(/\s+/g, ' ').trim(); S.crew.scan.manual = v;
+      var hit = null; Object.keys(S.crew.wos).forEach(function (id) { if (S.crew.wos[id].plate === v && S.crew.wos[id].state !== 'done') hit = id; });
+      if (hit) { S.crew.currentWo = hit; S.crew.scan.found = true; S.crew.scan.reading = v; }
+      else toast('확인 필요', '"' + (v || '빈 값') + '"은 오늘 작업 목록에 없어요. 유사 번호는 확인 후 진행하세요.');
+    },
+    'start-work': function (v) {
+      S.crew.currentWo = v; var w = S.crew.wos[v]; w.state = 'working';
+      S.crew.work = { started: Date.now(), before: false, after: false, finding: '', tick: null };
+      S.crew.scan.found = false; S.crew.scan.reading = '— — ————'; stopScan();
+      go('k-work'); toast('고객 Push 발송', '"세차가 시작되었습니다" · ' + w.plate); return true;
+    },
+    shot: function (v) { S.crew.work[v] = true; },
+    finding: function (v) { S.crew.work.finding = v; },
+    finish: function () { S.crew.wos[S.crew.currentWo].state = 'done'; stopTick(); go('k-done', true); return true; },
+    issue: function (v) { S.crew.wos[S.crew.currentWo].state = 'issue'; stopTick(); go('k-batch', true); toast('이슈 기록됨', v + ' · 운영팀 Exception Queue로 전달 · 고객 회차 보전'); return true; },
+    'next-wo': function () {
+      var next = null; Object.keys(S.crew.wos).forEach(function (id) { if (!next && S.crew.wos[id].state === 'todo') next = id; });
+      if (!next) { go('k-today', true); toast('오늘 작업 끝', '수고하셨어요. 정산은 수입 탭에서 확인하세요.'); return true; }
+      S.crew.currentWo = next; S.crew.scan.found = false; S.crew.scan.reading = '— — ————'; go('k-scan', true); startScan(); return true;
+    }
+  };
+
+  // ---------- Navigation & render ----------
+  function go(id, reset) { if (reset) S.stack = []; else if (S.screen !== id) S.stack.push(S.screen); S.screen = id; }
+  function back() { S.screen = S.stack.pop() || (S.app === 'customer' ? 'c-home' : 'k-today'); }
+  function switchApp(app) { stopScan(); stopTick(); S.app = app; S.stack = []; S.screen = app === 'customer' ? 'c-splash' : 'k-login'; render(); }
+
+  function render() {
+    var scr = document.getElementById('screen');
+    scr.innerHTML = R[S.screen] ? R[S.screen]() : '<div class="page">준비 중</div>';
+    scr.scrollTop = 0;
+    // tabbar
+    var tb = document.getElementById('tabbar');
+    if (NO_TAB[S.screen]) { tb.hidden = true; } else {
+      tb.hidden = false;
+      tb.innerHTML = TABS[S.app].map(function (t) { return '<button type="button" data-tab="' + t[0] + '" aria-current="' + (S.screen === t[0]) + '">' + ICON[t[2]] + t[1] + '</button>'; }).join('');
+    }
+    // flow list
+    document.getElementById('flow-title').textContent = S.app === 'customer' ? '고객 MVP 화면' : '크루 MVP 화면';
+    document.getElementById('flow-list').innerHTML = FLOWS[S.app].map(function (f, i) { return '<li><button type="button" data-jump="' + f[0] + '" aria-current="' + (S.screen === f[0]) + '"><span class="n">' + (i + 1) + '</span><span>' + f[1] + '</span></button></li>'; }).join('');
+    document.getElementById('flow-note').innerHTML = NOTES[S.app];
+    document.getElementById('seg-customer').setAttribute('aria-pressed', S.app === 'customer');
+    document.getElementById('seg-crew').setAttribute('aria-pressed', S.app === 'crew');
+    // timer tick
+    stopTick();
+    if (S.screen === 'k-work' && S.crew.work.started) { S.crew.work.tick = setInterval(function () { var t = document.getElementById('timer'); if (t) t.textContent = elapsed(); }, 1000); }
+    if (window.claude && window.claude.hot && window.claude.hot.snapshot) { try { window.claude.hot.snapshot({ app: S.app, screen: S.screen }); } catch (e) {} }
+  }
+
+  document.addEventListener('click', function (e) {
+    var el = e.target.closest('[data-go],[data-back],[data-act],[data-tab],[data-jump],[data-app]');
+    if (!el) return;
+    if (el.dataset.app) { switchApp(el.dataset.app); return; }
+    if (el.dataset.jump) { stopScan(); go(el.dataset.jump, true); render(); return; }
+    if (el.dataset.tab) { stopScan(); go(el.dataset.tab, true); render(); return; }
+    if (el.hasAttribute('data-back')) { stopScan(); back(); render(); return; }
+    if (el.dataset.go) { go(el.dataset.go); render(); return; }
+    if (el.dataset.act && ACT[el.dataset.act]) { var handled = ACT[el.dataset.act](el.dataset.v); if (!handled) render(); else render(); }
+  });
+
+  document.getElementById('brand').innerHTML = mark(32) + '<strong>차집사</strong><span>Vehicle Care Concierge</span>';
+
+  function start(data) {
+    if (data && data.app && R[data.screen]) { S.app = data.app; S.screen = data.screen; }
+    // Deep link: #crew opens the crew app, #k-scan (or any screen id) opens that screen directly.
+    var h = (location.hash || '').replace('#', '');
+    if (h === 'crew') { S.app = 'crew'; S.screen = 'k-today'; }
+    else if (h === 'customer') { S.app = 'customer'; S.screen = 'c-home'; }
+    else if (R[h]) { S.app = h.charAt(0) === 'k' ? 'crew' : 'customer'; S.screen = h; }
+    render();
+  }
+  if (window.claude && window.claude.hot && window.claude.hot.ready) { window.claude.hot.ready(start); } else { start((window.claude && window.claude.hot && window.claude.hot.data) || {}); }
+})();
+</script>
+
+</body></html>
