@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#120E1C">
+<meta name="robots" content="noindex">
+<title>차집사 크루</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 140'%3E%3Crect width='140' height='140' rx='32' fill='%236B3FA0'/%3E%3Ccircle cx='70' cy='42' r='14' fill='none' stroke='%23fff' stroke-width='7'/%3E%3Crect x='66' y='54' width='8' height='22' fill='%23fff'/%3E%3Crect x='66' y='66' width='16' height='7' fill='%23fff'/%3E%3Cpath d='M40 88 L50 74 H90 L100 88 H112 A6 6 0 0 1 118 94 V108 H22 V94 A6 6 0 0 1 28 88 Z' fill='%23fff'/%3E%3Ccircle cx='42' cy='110' r='9' fill='%23fff'/%3E%3Ccircle cx='98' cy='110' r='9' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@400;700;800&display=swap">
+<style>
+  :root {
+    color-scheme: dark;
+    --bg:#120E1C; --surface:#1D1730; --surface-2:#27203E; --surface-3:#31284C;
+    --line:rgba(255,255,255,0.09); --line-strong:rgba(255,255,255,0.16);
+    --text:#F3EFFA; --muted:#A79FBF; --dim:#7A7293;
+    --purple:#8A5BC0; --purple-deep:#6B3FA0; --purple-soft:rgba(138,91,192,0.22);
+    --lime:#C4FF4D; --lime-ink:#2C3A05; --lime-soft:rgba(196,255,77,0.14);
+    --warn:#F5A623; --warn-soft:rgba(245,166,35,0.16);
+    --danger:#FF6B6B; --danger-soft:rgba(255,107,107,0.16);
+    --ok:#3FE0A0; --ok-soft:rgba(63,224,160,0.16);
+    --font:"Gothic A1","Pretendard","Apple SD Gothic Neo","Noto Sans KR",system-ui,-apple-system,sans-serif;
+    --r:12px; --r-lg:18px; --r-pill:999px;
+    --safe-b: env(safe-area-inset-bottom, 0px);
+  }
+  * { box-sizing:border-box; }
+  html { height:100%; }
+  body { margin:0; min-height:100%; background:var(--bg); color:var(--text); font-family:var(--font); font-size:15px; line-height:1.55; -webkit-font-smoothing:antialiased; -webkit-tap-highlight-color:transparent; }
+  button, input, textarea { font-family:inherit; font-size:inherit; }
+  button { cursor:pointer; }
+  button:focus-visible, input:focus-visible, textarea:focus-visible { outline:2px solid var(--lime); outline-offset:2px; }
+  ::placeholder { color:var(--dim); }
+
+  /* App frame: full-bleed on phones, centered column on larger screens */
+  .app { min-height:100dvh; max-width:430px; margin:0 auto; background:var(--bg); display:flex; flex-direction:column; position:relative; }
+  @media (min-width: 640px) {
+    body { background:#0B0812; }
+    .app { min-height:100dvh; border-left:1px solid var(--line); border-right:1px solid var(--line); }
+  }
+
+  .head { position:sticky; top:0; z-index:5; background:rgba(18,14,28,0.92); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border-bottom:1px solid var(--line); display:flex; align-items:center; gap:8px; min-height:56px; padding-inline:12px 16px; }
+  .head .back { border:0; background:transparent; color:var(--text); width:40px; height:40px; border-radius:10px; display:grid; place-items:center; margin-left:-4px; }
+  .head .back:active { background:var(--surface-2); }
+  .head h1 { margin:0; font-size:17px; font-weight:800; letter-spacing:-0.01em; flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .head .sub { font-size:12px; color:var(--muted); font-weight:400; margin-left:6px; }
+  .head .brand { width:26px; height:26px; border-radius:7px; flex:0 0 auto; }
+  .demo { font-size:10px; font-weight:800; letter-spacing:0.12em; color:var(--warn); border:1px solid rgba(245,166,35,0.45); border-radius:4px; padding:1px 5px; line-height:1.4; }
+
+  .page { flex:1; display:flex; flex-direction:column; gap:14px; padding-inline:16px; padding-block:14px calc(24px + var(--safe-b)); }
+  .cta-bar { position:sticky; bottom:0; margin-inline:-16px; margin-top:auto; padding-inline:16px; padding-block:12px calc(14px + var(--safe-b)); background:linear-gradient(180deg, rgba(18,14,28,0) 0%, var(--bg) 28%); display:flex; flex-direction:column; gap:8px; }
+
+  .plate { font-weight:800; letter-spacing:0.04em; font-variant-numeric:tabular-nums; }
+  .plate.xl { font-size:34px; line-height:1.15; }
+  .plate.lg { font-size:26px; line-height:1.2; }
+  .plate.md { font-size:20px; }
+  .muted { color:var(--muted); }
+  .small { font-size:12px; color:var(--muted); }
+  .tiny { font-size:11px; color:var(--dim); }
+  .title { margin:0; font-size:20px; font-weight:800; letter-spacing:-0.01em; text-wrap:balance; }
+  .h2 { margin:0; font-size:15px; font-weight:800; }
+  .lead { margin:0; font-size:16px; font-weight:700; line-height:1.5; }
+
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:var(--r-lg); padding:16px; display:flex; flex-direction:column; gap:10px; }
+  .card.flat { background:var(--surface-2); border-color:transparent; }
+  .card.danger { border-color:rgba(255,107,107,0.6); background:rgba(255,107,107,0.06); }
+  .card.ok { border-color:rgba(196,255,77,0.5); background:rgba(196,255,77,0.05); }
+  .card.warn { border-color:rgba(245,166,35,0.5); background:rgba(245,166,35,0.06); }
+  .row { display:flex; align-items:center; gap:10px; }
+  .row.between { justify-content:space-between; }
+  .stack { display:flex; flex-direction:column; gap:8px; }
+  .kv { display:grid; grid-template-columns:88px 1fr; gap:8px 12px; margin:0; font-size:14px; }
+  .kv dt { color:var(--muted); }
+  .kv dd { margin:0; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+  .kv dd.strong { font-weight:800; font-size:16px; }
+  .kv dd.bad { color:var(--danger); font-weight:800; font-size:16px; }
+
+  .btn { border:0; border-radius:var(--r); padding:15px 18px; font-weight:800; font-size:16px; display:inline-flex; align-items:center; justify-content:center; gap:8px; width:100%; color:var(--text); background:var(--surface-2); min-height:52px; }
+  .btn:active { transform:translateY(1px); }
+  .btn.primary { background:var(--lime); color:var(--lime-ink); }
+  .btn.purple { background:var(--purple-deep); color:#fff; }
+  .btn.line { background:transparent; border:1.5px solid var(--line-strong); }
+  .btn.warn { background:var(--warn-soft); color:var(--warn); }
+  .btn.sm { min-height:40px; padding:9px 14px; font-size:14px; width:auto; }
+  .btn:disabled { opacity:0.4; cursor:not-allowed; transform:none; }
+  .btnrow { display:flex; gap:8px; }
+  .btnrow .btn { flex:1; }
+  .link { border:0; background:transparent; color:var(--muted); text-decoration:underline; text-underline-offset:3px; padding:8px; font-size:14px; }
+
+  .badge { display:inline-flex; align-items:center; gap:6px; border-radius:var(--r-pill); padding:4px 10px; font-size:12px; font-weight:800; line-height:1.3; white-space:nowrap; background:var(--surface-3); color:var(--muted); }
+  .badge.ok { background:var(--ok-soft); color:var(--ok); }
+  .badge.lime { background:var(--lime-soft); color:var(--lime); }
+  .badge.warn { background:var(--warn-soft); color:var(--warn); }
+  .badge.danger { background:var(--danger-soft); color:var(--danger); }
+  .badge.purple { background:var(--purple-soft); color:#CDB4F0; }
+  .dot { width:7px; height:7px; border-radius:50%; background:currentColor; }
+
+  /* Assigned vehicle list */
+  .vlist { display:flex; flex-direction:column; gap:10px; }
+  .vrow { display:grid; grid-template-columns:28px 1fr auto; gap:12px; align-items:center; width:100%; text-align:left; background:var(--surface); border:1px solid var(--line); border-radius:var(--r-lg); padding:14px 14px 14px 12px; color:var(--text); }
+  .vrow:active { background:var(--surface-2); }
+  .vrow .n { font-size:13px; font-weight:800; color:var(--dim); text-align:center; }
+  .vrow .info { min-width:0; display:flex; flex-direction:column; gap:3px; }
+  .vrow .meta { font-size:13px; color:var(--muted); overflow-wrap:anywhere; }
+  .vrow .right { display:flex; flex-direction:column; align-items:flex-end; gap:6px; }
+  .vrow .chev { color:var(--dim); }
+  .vrow.done { opacity:0.6; }
+  .summary { display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; }
+  .summary .big { font-size:28px; font-weight:800; line-height:1; }
+
+  .field { display:flex; flex-direction:column; gap:6px; }
+  .field label { font-size:13px; font-weight:700; color:var(--muted); }
+  .input { width:100%; border:1.5px solid var(--line-strong); border-radius:var(--r); padding:14px; font-size:20px; font-weight:800; letter-spacing:0.04em; background:var(--surface); color:var(--text); font-variant-numeric:tabular-nums; }
+  .input.normal { font-size:16px; font-weight:400; letter-spacing:0; }
+  .input:focus { border-color:var(--lime); outline:none; }
+  .input.err { border-color:var(--danger); }
+  .errmsg { font-size:13px; color:var(--danger); }
+  .chips { display:flex; gap:8px; flex-wrap:wrap; }
+  .chip { border:1px solid var(--line-strong); background:transparent; color:var(--muted); border-radius:var(--r-pill); padding:7px 12px; font-size:13px; font-weight:700; }
+  .choice { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .choice button { border:1.5px solid var(--line-strong); background:transparent; color:var(--muted); border-radius:var(--r); padding:12px; font-weight:800; min-height:48px; }
+  .choice button[aria-pressed="true"] { border-color:var(--lime); color:var(--lime); background:var(--lime-soft); }
+
+  .photos { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .photo { aspect-ratio:4/3; border-radius:var(--r); position:relative; overflow:hidden; display:grid; place-items:center; color:var(--muted); font-weight:800; font-size:14px; border:1.5px dashed var(--line-strong); background:var(--surface); width:100%; max-width:100%; }
+  .photo.shot { border-style:solid; border-color:rgba(196,255,77,0.5); background:linear-gradient(135deg,#3A2C58 0%,#6B3FA0 100%); color:#fff; }
+  .photo .tag { position:absolute; top:8px; left:8px; background:rgba(0,0,0,0.45); padding:3px 8px; border-radius:var(--r-pill); font-size:11px; color:#fff; }
+  .photo .ok { position:absolute; bottom:8px; right:8px; background:var(--lime); color:var(--lime-ink); padding:3px 8px; border-radius:var(--r-pill); font-size:11px; }
+
+  /* Locate */
+  .spot { background:var(--surface); border:1px solid var(--line); border-radius:var(--r-lg); padding:18px 16px; display:flex; flex-direction:column; gap:4px; }
+  .spot .where { font-size:26px; font-weight:800; letter-spacing:-0.01em; }
+  .around { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .around div { aspect-ratio:4/3; border-radius:var(--r); background:linear-gradient(160deg,#2A2140,#1A1428); border:1px solid var(--line); display:grid; place-items:center; font-size:12px; color:var(--dim); max-width:100%; }
+
+  /* Scan */
+  .cam { position:relative; background:radial-gradient(120% 80% at 50% 30%, #3A3350 0%, #0F0B18 75%); border-radius:var(--r-lg); aspect-ratio:3/4; overflow:hidden; color:#fff; display:flex; flex-direction:column; justify-content:flex-end; max-width:100%; border:1px solid var(--line); }
+  .cam .grid { position:absolute; inset:0; background-image:linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px); background-size:32px 32px; }
+  .cam .car { position:absolute; left:50%; top:42%; transform:translate(-50%,-50%); width:min(200px, 60%); opacity:0.9; }
+  .cam .plate-sim { position:absolute; left:50%; top:56%; transform:translate(-50%,-50%); background:#F5F5F0; color:#1A1A3A; font-weight:800; font-size:20px; letter-spacing:0.06em; padding:6px 14px; border-radius:4px; border:2px solid #C9C9C0; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .cam .box { position:absolute; left:50%; top:56%; transform:translate(-50%,-50%); width:min(200px, 62%); height:58px; border:2px solid rgba(196,255,77,0.95); border-radius:6px; box-shadow:0 0 0 999px rgba(15,11,24,0.4); }
+  .cam .scanline { position:absolute; left:8%; right:8%; top:20%; height:2px; background:linear-gradient(90deg, transparent, var(--lime), transparent); animation:scan 1.6s ease-in-out infinite; }
+  .cam.found .scanline { display:none; }
+  .cam.found .box { border-color:var(--lime); box-shadow:0 0 0 999px rgba(15,11,24,0.55), 0 0 24px rgba(196,255,77,0.6); }
+  .cam .readout { position:relative; padding:14px; background:linear-gradient(180deg, transparent, rgba(15,11,24,0.95)); display:flex; flex-direction:column; gap:4px; }
+  .cam .readout .r { font-size:12px; color:rgba(255,255,255,0.7); }
+  .cam .readout .v { font-size:22px; font-weight:800; letter-spacing:0.04em; }
+  .cam .readout .v.match { color:var(--lime); }
+  .cam .demo-tag { position:absolute; top:10px; right:10px; }
+  @keyframes scan { 0%{top:20%} 50%{top:82%} 100%{top:20%} }
+  @media (prefers-reduced-motion: reduce) { .cam .scanline { animation:none; } }
+
+  .timer { font-size:48px; font-weight:800; line-height:1; font-variant-numeric:tabular-nums; letter-spacing:-0.02em; }
+  .steps { display:flex; flex-direction:column; }
+  .step { display:grid; grid-template-columns:22px 1fr; gap:12px; padding-block:7px; }
+  .step .b { width:22px; height:22px; border-radius:50%; border:2px solid var(--line-strong); display:grid; place-items:center; font-size:11px; font-weight:800; color:var(--dim); }
+  .step.done .b { background:var(--ok); border-color:var(--ok); color:#06261A; }
+  .step.now .b { background:var(--lime); border-color:var(--lime); color:var(--lime-ink); }
+  .step .t { font-weight:800; font-size:14px; color:var(--muted); }
+  .step.done .t, .step.now .t { color:var(--text); }
+  .step .s { font-size:12px; color:var(--dim); }
+
+  .sim { border:1px dashed rgba(245,166,35,0.45); border-radius:var(--r); padding:12px; display:flex; flex-direction:column; gap:8px; }
+  .sim .t { font-size:12px; color:var(--warn); font-weight:800; letter-spacing:0.04em; }
+  .toast { position:fixed; left:50%; top:68px; transform:translateX(-50%); background:var(--lime); color:var(--lime-ink); font-weight:800; padding:12px 18px; border-radius:var(--r-pill); box-shadow:0 12px 30px rgba(0,0,0,0.5); z-index:20; max-width:calc(100% - 32px); text-align:center; }
+  .toast[hidden] { display:none; }
+  .sr { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ---------- Fixture (DEMO) ----------
+  var TONIGHT = { site: '지산동 그린타운', slot: '21:00 – 23:00', date: '9월 10일 (목)' };
+  var FIXTURE = [
+    { id: 'WO-DEMO-001', plate: '123가1234', type: 'SUV', color: '브라운·그레이', spot: '지하 1층 B-27', spotNote: '엘리베이터 B홀 뒤편, 기둥 27번 옆', plan: '월 4회 · 3회차', memo: '뒷유리 김서림 주의', lastParked: '9/10 20:12', eta: '21:00', mismatch: '123가5678' },
+    { id: 'WO-DEMO-002', plate: '26모2057', type: '승용 · BMW 520d', color: '흰색', spot: '지하 1층 B-31', spotNote: '입구 램프 내려와 우측 두 번째 열', plan: '월 2회 · 1회차', memo: '', lastParked: '9/10 19:48', eta: '21:25', mismatch: '26모2075' },
+    { id: 'WO-DEMO-003', plate: '228나5331', type: '승용 · BMW 520d', color: '다크그레이', spot: '지하 2층 C-08', spotNote: '지하 2층 C구역 입구 쪽', plan: '1회 이용', memo: '오른쪽 뒷문 기존 스크래치 (기록됨)', lastParked: '9/10 20:30', eta: '21:50', mismatch: '228나5313' },
+    { id: 'WO-DEMO-004', plate: '314주4191', type: '미지정 (확정 대기)', color: '미지정 (확정 대기)', spot: '지하 2층 C-14', spotNote: 'C구역 안쪽, 비상구 옆', plan: '월 2회 · 2회차', memo: '', lastParked: '', eta: '22:15', mismatch: '314주4119' }
+  ];
+  var DECOYS = ['81호 2210', '45러 0931'];
+
+  function freshVehicleState() { return { ident: 'pending', method: null, input: '', correction: null, work: null }; }
+  function fresh() {
+    return { screen: 'list', cur: 0, manualErr: '', scan: { running: false, found: false, reading: '', step: 0 }, v: FIXTURE.map(function () { return freshVehicleState(); }) };
+  }
+  var S = fresh();
+  var timers = { scan: null, tick: null, toast: null };
+  var KEY = 'chajipsa-crew-demo-v1';
+  try { var saved = JSON.parse(localStorage.getItem(KEY) || 'null'); if (saved && saved.v && saved.v.length === FIXTURE.length) { S = saved; S.scan = { running: false, found: false, reading: '', step: 0 }; } } catch (e) {}
+  function persist() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+
+  // ---------- Helpers ----------
+  function V() { return FIXTURE[S.cur]; }
+  function VS() { return S.v[S.cur]; }
+  function norm(p) { return (p || '').replace(/\s+/g, '').trim(); }
+  function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;'); }
+  function now() { var d = new Date(); return (d.getHours() < 10 ? '0' : '') + d.getHours() + ':' + (d.getMinutes() < 10 ? '0' : '') + d.getMinutes(); }
+  function unknown(s) { return /^미지정/.test(s || ''); }
+  function otherAssigned(p) { var n = norm(p); for (var i = 0; i < FIXTURE.length; i++) if (i !== S.cur && norm(FIXTURE[i].plate) === n) return FIXTURE[i]; return null; }
+  function canStart(vs) { return vs.ident === 'matched' || (vs.correction && vs.correction.status === 'APPROVED'); }
+  function effectivePlate(i) { var vs = S.v[i]; return (vs.correction && vs.correction.status === 'APPROVED') ? vs.correction.plate : FIXTURE[i].plate; }
+  function methodLabel(vs) {
+    if (vs.correction && vs.correction.status === 'APPROVED') return '운영실 승인 · 이 작업에 한함';
+    if (vs.method === 'scan') return '번호판 스캔 일치';
+    if (vs.method === 'manual') return '직접 입력 일치';
+    return '미확인';
+  }
+  function statusOf(i) {
+    var vs = S.v[i];
+    if (vs.work && vs.work.finished) return ['완료', 'ok'];
+    if (vs.work && vs.work.started) return ['작업 중', 'lime'];
+    if (vs.correction && vs.correction.status === 'REQUESTED') return ['운영실 확인 중', 'warn'];
+    if (vs.correction && vs.correction.status === 'APPROVED') return ['확인 승인', 'ok'];
+    if (vs.correction && vs.correction.status === 'REJECTED') return ['반려', 'danger'];
+    if (vs.ident === 'matched') return ['차량 확인됨', 'ok'];
+    if (vs.ident === 'mismatch') return ['번호 불일치', 'danger'];
+    return ['예정', ''];
+  }
+  function badge(i) { var s = statusOf(i); return '<span class="badge ' + s[1] + '">' + (s[1] ? '<i class="dot"></i>' : '') + s[0] + '</span>'; }
+  function vibrate(p) { try { if (navigator.vibrate) navigator.vibrate(p); } catch (e) {} }
+  function toast(msg) { var t = document.getElementById('toast'); t.textContent = msg; t.hidden = false; clearTimeout(timers.toast); timers.toast = setTimeout(function () { t.hidden = true; }, 1800); }
+  function stopScan() { if (timers.scan) { clearTimeout(timers.scan); timers.scan = null; } S.scan.running = false; }
+
+  var ICON = {
+    back: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
+    chev: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>',
+    mark: '<svg class="brand" viewBox="0 0 140 140" aria-hidden="true"><rect width="140" height="140" rx="32" fill="#6B3FA0"/><circle cx="70" cy="42" r="14" fill="none" stroke="#fff" stroke-width="7"/><rect x="66" y="54" width="8" height="22" fill="#fff"/><rect x="66" y="66" width="16" height="7" fill="#fff"/><path d="M40 88 L50 74 H90 L100 88 H112 A6 6 0 0 1 118 94 V108 H22 V94 A6 6 0 0 1 28 88 Z" fill="#fff"/><circle cx="42" cy="110" r="9" fill="#fff"/><circle cx="98" cy="110" r="9" fill="#fff"/></svg>',
+    car: '<svg class="car" viewBox="0 0 190 90" aria-hidden="true"><path d="M20 62 L38 30 H140 L170 62 H182 V78 H8 V62 Z" fill="#8A7A6E"/><path d="M48 34 H132 L150 58 H32 Z" fill="#B9AFA6"/><circle cx="44" cy="80" r="11" fill="#2A2438"/><circle cx="146" cy="80" r="11" fill="#2A2438"/></svg>'
+  };
+  function head(title, back, sub, extra) {
+    return '<header class="head">' + (back ? '<button type="button" class="back" data-go="' + back + '" aria-label="뒤로">' + ICON.back + '</button>' : ICON.mark)
+      + '<h1>' + title + (sub ? '<span class="sub">' + sub + '</span>' : '') + '</h1>' + (extra || '') + '<span class="demo" title="데모 데이터">DEMO</span></header>';
+  }
+
+  // ---------- Screens ----------
+  var R = {};
+
+  R.list = function () {
+    var done = 0; S.v.forEach(function (vs) { if (vs.work && vs.work.finished) done++; });
+    var html = head('오늘 배정 차량', null, null, '<button type="button" class="link" data-act="reset" style="font-size:12px;padding:6px">초기화</button>')
+      + '<main class="page">'
+      + '<div class="card flat"><div class="summary"><span class="big">' + FIXTURE.length + '대</span><span class="muted">' + TONIGHT.date + ' · ' + TONIGHT.slot + '</span></div><div class="row between"><span class="small">' + TONIGHT.site + ' · 이동 순서대로</span><span class="badge ok">' + done + ' / ' + FIXTURE.length + ' 완료</span></div></div>'
+      + '<div class="vlist">';
+    FIXTURE.forEach(function (v, i) {
+      var st = statusOf(i);
+      html += '<button type="button" class="vrow' + (st[0] === '완료' ? ' done' : '') + '" data-act="pick" data-v="' + i + '">'
+        + '<span class="n">' + (i + 1) + '</span>'
+        + '<span class="info"><span class="plate lg">' + v.plate + '</span><span class="meta">' + v.type + ' · ' + v.color + '</span><span class="meta">' + v.spot + '</span></span>'
+        + '<span class="right">' + badge(i) + '<span class="chev">' + ICON.chev + '</span></span>'
+        + '</button>';
+    });
+    html += '</div><p class="tiny" style="text-align:center;margin:4px 0 0">차량번호와 고객 정보는 데모용 예시입니다.</p></main>';
+    return html;
+  };
+
+  R.detail = function () {
+    var v = V(), vs = VS();
+    var cta;
+    if (vs.work && vs.work.finished) cta = '<button type="button" class="btn line" data-go="list">목록으로</button>';
+    else if (vs.work && vs.work.started) cta = '<button type="button" class="btn primary" data-go="work">작업 화면으로</button>';
+    else if (canStart(vs)) cta = '<button type="button" class="btn primary" data-act="start-work">작업 시작</button>';
+    else if (vs.correction && vs.correction.status === 'REQUESTED') cta = '<button type="button" class="btn warn" data-go="status">운영실 확인 상태 보기</button>';
+    else cta = '<button type="button" class="btn primary" data-go="locate">이 차 찾기</button>';
+    return head(v.id, 'list', null)
+      + '<main class="page">'
+      + '<div class="row between"><span class="plate xl">' + v.plate + '</span>' + badge(S.cur) + '</div>'
+      + '<div class="card"><dl class="kv"><dt>차종</dt><dd>' + v.type + '</dd><dt>색상</dt><dd>' + v.color + '</dd><dt>주차 위치</dt><dd class="strong">' + v.spot + '</dd><dt>작업 예정</dt><dd>' + v.eta + ' · ' + v.plan + '</dd><dt>고객 특이사항</dt><dd>' + (v.memo || '없음') + '</dd></dl></div>'
+      + (unknown(v.type) ? '<div class="card warn"><div class="h2">차종·색상 확정 대기</div><div class="small">운영실에서 확정 전입니다. 현장에서 임의로 판단하지 마세요.</div></div>' : '')
+      + '<div class="card flat"><div class="h2">작업 전 확인</div><div class="stack small" style="color:var(--muted)"><div>1. 번호판 일치 확인 (스캔 또는 직접 입력)</div><div>2. 번호가 다르면 작업하지 않고 운영실 확인 요청</div><div>3. Before 사진 3장 이상</div></div></div>'
+      + '<div class="cta-bar">' + cta + '</div></main>';
+  };
+
+  R.locate = function () {
+    var v = V();
+    return head('차량 찾기', 'detail', v.plate)
+      + '<main class="page">'
+      + '<div class="spot"><span class="small">주차 위치</span><span class="where">' + v.spot + '</span><span class="muted">' + v.spotNote + '</span></div>'
+      + (v.lastParked ? '<div class="card flat"><div class="row between"><div><div class="h2" style="font-size:14px">최근 주차 기록</div><div class="small">' + v.lastParked + ' · ' + v.spot + '</div></div><span class="badge purple">참고</span></div></div>' : '')
+      + '<div><div class="small" style="margin-bottom:6px">주변 사진</div><div class="around"><div>주차 구역 사진</div><div>기둥 · 표지 사진</div></div></div>'
+      + '<div class="cta-bar"><button type="button" class="btn primary" data-act="scan-open">번호판 스캔</button><button type="button" class="btn line" data-act="manual-open">번호 직접 입력</button></div></main>';
+  };
+
+  R.scan = function () {
+    var v = V(), sc = S.scan;
+    var html = head('번호판 스캔', 'locate', v.plate)
+      + '<main class="page">'
+      + '<div class="cam' + (sc.found ? ' found' : '') + '"><div class="grid"></div>' + ICON.car
+      + '<div class="plate-sim">' + (sc.found ? v.plate : (sc.reading || '— — ————')) + '</div>'
+      + '<div class="box"></div>' + (sc.running ? '<div class="scanline"></div>' : '')
+      + '<span class="demo demo-tag">SIM</span>'
+      + '<div class="readout"><div class="r">' + (sc.found ? '배정 차량 발견 · 번호 일치' : (sc.running ? '번호판을 인식하고 있어요. 차량 정면을 비춰 주세요' : '카메라를 번호판에 맞추고 스캔을 시작하세요')) + '</div>'
+      + '<div class="v' + (sc.found ? ' match' : '') + '">' + (sc.found ? v.plate : (sc.reading || '배정 ' + v.plate)) + '</div></div></div>';
+    if (sc.found) html += '<div class="cta-bar"><button type="button" class="btn primary" data-act="confirm-scan">차량 확인</button><button type="button" class="btn line" data-act="scan-reset">다시 스캔</button></div>';
+    else html += '<div class="cta-bar">' + (sc.running ? '<button type="button" class="btn line" data-act="scan-stop">스캔 중지</button>' : '<button type="button" class="btn primary" data-act="scan-start">스캔 시작</button>') + '<button type="button" class="link" data-act="manual-open">인식이 어려우면 번호 직접 입력</button></div>';
+    return html + '</main>';
+  };
+
+  R.manual = function () {
+    var v = V(), vs = VS();
+    return head('번호 직접 입력', 'locate', v.plate)
+      + '<main class="page">'
+      + '<p class="lead">현장에서 확인한 차량번호를 입력하세요.</p>'
+      + '<div class="field"><label for="f-plate">차량번호</label><input class="input' + (S.manualErr ? ' err' : '') + '" id="f-plate" autocomplete="off" inputmode="text" enterkeyhint="done" placeholder="예 123가1234" value="' + esc(vs.input) + '">' + (S.manualErr ? '<div class="errmsg">' + S.manualErr + '</div>' : '') + '</div>'
+      + '<div class="chips"><span class="tiny" style="align-self:center">데모 예시</span><button type="button" class="chip" data-act="fill" data-v="' + v.plate + '">' + v.plate + ' (배정)</button><button type="button" class="chip" data-act="fill" data-v="' + v.mismatch + '">' + v.mismatch + ' (다른 번호)</button></div>'
+      + '<div class="card flat"><div class="small">배정 번호 <b style="color:var(--text)">' + v.plate + '</b>와 비교합니다. 다르면 작업을 시작할 수 없고 운영실 확인으로 이어집니다.</div></div>'
+      + '<div class="cta-bar"><button type="button" class="btn primary" data-act="manual-confirm">확인</button></div></main>';
+  };
+
+  R.match = function () {
+    var v = V(), vs = VS();
+    return head('차량 확인', 'detail', v.id)
+      + '<main class="page">'
+      + '<div class="card ok"><div class="row between"><span class="badge lime"><i class="dot"></i>차량 확인 완료</span><span class="small">' + now() + '</span></div><span class="plate xl">' + v.plate + '</span>'
+      + '<dl class="kv"><dt>배정 번호</dt><dd class="strong">' + v.plate + '</dd><dt>' + (vs.method === 'scan' ? '인식 번호' : '입력 번호') + '</dt><dd class="strong">' + (vs.input || v.plate) + '</dd><dt>차종</dt><dd>' + v.type + '</dd><dt>색상</dt><dd>' + v.color + '</dd><dt>일치 여부</dt><dd><span class="badge ok">일치 · ' + methodLabel(vs) + '</span></dd></dl></div>'
+      + '<div class="card flat"><div class="small">작업을 시작하면 고객에게 "세차가 시작되었습니다" 알림이 갑니다. (데모에서는 발송하지 않음)</div></div>'
+      + '<div class="cta-bar"><button type="button" class="btn primary" data-act="start-work">작업 시작</button></div></main>';
+  };
+
+  R.mismatch = function () {
+    var v = V(), vs = VS(); var other = otherAssigned(vs.input);
+    return head('번호 불일치', 'manual', v.id)
+      + '<main class="page">'
+      + '<div class="card danger"><p class="lead" style="color:var(--danger)">배정된 차량번호와 현장에서 확인한 번호가 다릅니다.</p>'
+      + '<dl class="kv"><dt>배정 번호</dt><dd class="strong">' + v.plate + '</dd><dt>현장 번호</dt><dd class="bad">' + esc(vs.input) + '</dd><dt>차종</dt><dd>' + v.type + '</dd><dt>색상</dt><dd>' + v.color + '</dd></dl>'
+      + (other ? '<div class="badge warn">이 번호는 ' + other.id + '에 배정된 차량입니다</div><div class="small">그 차량은 해당 작업 건에서 따로 확인하세요. 이 작업 건에서는 진행할 수 없습니다.</div>' : '')
+      + '</div>'
+      + '<div class="card flat"><div class="row between"><div class="h2">작업 시작 불가</div><span class="badge danger">차단</span></div><div class="small">번호가 일치하거나 운영실 확인이 끝나야 시작할 수 있습니다. 차량번호는 이 화면에서 고칠 수 없습니다.</div></div>'
+      + '<div class="cta-bar"><button type="button" class="btn line" data-act="retry">다시 입력</button><button type="button" class="btn warn" data-act="to-correction" data-reason="고객 입력 오류 의심">고객 입력 오류 의심</button><button type="button" class="btn purple" data-act="to-correction" data-reason="운영실 확인 요청">운영실 확인 요청</button></div></main>';
+  };
+
+  R.correction = function () {
+    var v = V(), vs = VS(), c = vs.correction;
+    var typeOk = unknown(v.type) ? norm(c.type).length > 0 : (c.typeSame === true || (c.typeSame === false && norm(c.type).length > 0));
+    var colorOk = unknown(v.color) ? norm(c.color).length > 0 : (c.colorSame === true || (c.colorSame === false && norm(c.color).length > 0));
+    var ready = norm(c.plate).length >= 7 && c.photoPlate && c.photoFront && typeOk && colorOk;
+    function pick(kind, label, same, val) {
+      if (unknown(label)) return '<input class="input normal" id="f-' + kind + '" placeholder="현장에서 확인한 ' + (kind === 'type' ? '차종' : '색상') + '" value="' + esc(val) + '">';
+      return '<div class="choice"><button type="button" data-act="same" data-k="' + kind + '" data-v="1" aria-pressed="' + (same === true) + '">' + label + '</button><button type="button" data-act="same" data-k="' + kind + '" data-v="0" aria-pressed="' + (same === false) + '">다름</button></div>'
+        + (same === false ? '<input class="input normal" id="f-' + kind + '" placeholder="실제 ' + (kind === 'type' ? '차종' : '색상') + '" value="' + esc(val) + '">' : '');
+    }
+    return head('운영실 정정 요청', 'mismatch', v.id)
+      + '<main class="page">'
+      + '<div class="row"><span class="badge warn">' + c.reason + '</span><span class="small">배정 ' + v.plate + '</span></div>'
+      + '<div class="field"><label for="f-actual">현장 확인 차량번호</label><input class="input" id="f-actual" autocomplete="off" value="' + esc(c.plate) + '" placeholder="예 123가5678"></div>'
+      + '<div class="field"><label>사진 (필수)</label><div class="photos">'
+      + '<button type="button" class="photo' + (c.photoPlate ? ' shot' : '') + '" data-act="photo" data-v="plate"><span class="tag">번호판</span>' + (c.photoPlate ? '<span class="ok">촬영됨</span>' : '촬영') + '</button>'
+      + '<button type="button" class="photo' + (c.photoFront ? ' shot' : '') + '" data-act="photo" data-v="front"><span class="tag">차량 전면</span>' + (c.photoFront ? '<span class="ok">촬영됨</span>' : '촬영') + '</button>'
+      + '</div></div>'
+      + '<div class="field"><label>차종' + (unknown(v.type) ? '' : ' <span class="tiny">(배정 ' + v.type + ')</span>') + '</label>' + pick('type', v.type, c.typeSame, c.type) + '</div>'
+      + '<div class="field"><label>색상' + (unknown(v.color) ? '' : ' <span class="tiny">(배정 ' + v.color + ')</span>') + '</label>' + pick('color', v.color, c.colorSame, c.color) + '</div>'
+      + '<div class="field"><label for="f-memo">메모 <span class="tiny">(선택)</span></label><textarea class="input normal" id="f-memo" rows="2" placeholder="예: 같은 자리에 다른 차량이 주차되어 있음">' + esc(c.memo) + '</textarea></div>'
+      + '<div class="cta-bar"><button type="button" class="btn primary" data-act="submit" ' + (ready ? '' : 'disabled') + '>운영실에 정정 요청</button><p class="tiny" style="margin:0;text-align:center">' + (ready ? '요청 후 운영실 확인 전까지 작업을 시작할 수 없습니다.' : '번호 · 사진 2장 · 차종 · 색상을 모두 입력해야 요청할 수 있습니다.') + '</p></div></main>';
+  };
+
+  R.status = function () {
+    var v = V(), vs = VS(), c = vs.correction;
+    var html = head('운영실 확인', 'detail', c.id) + '<main class="page">';
+    if (c.status === 'REQUESTED') {
+      html += '<div class="card warn"><div class="row between"><span class="badge warn"><i class="dot"></i>운영실 확인 중</span><span class="tiny">VEHICLE_CORRECTION_REQUESTED</span></div><p class="lead">요청을 보냈어요. 운영실 확인 전까지 이 차량은 작업할 수 없습니다.</p></div>';
+    } else if (c.status === 'APPROVED') {
+      html += '<div class="card ok"><div class="row between"><span class="badge lime"><i class="dot"></i>확인 승인</span><span class="tiny">APPROVED</span></div><p class="lead">해당 Work Order에 한해 차량 확인이 승인되었습니다.</p><div class="small">이 작업은 <b style="color:var(--text)">' + esc(c.plate) + '</b>으로 진행합니다. 고객 차량 정보(' + v.plate + ')는 바뀌지 않으며 운영실이 별도로 정리합니다.</div></div>';
+    } else {
+      html += '<div class="card danger"><div class="row between"><span class="badge danger">반려</span><span class="tiny">REJECTED</span></div><p class="lead">운영실에서 확인이 필요하다고 답했어요.</p><div class="small">번호를 다시 확인하거나 사진을 추가해 다시 요청하세요. 작업은 시작할 수 없습니다.</div></div>';
+    }
+    html += '<div class="card"><dl class="kv"><dt>배정 번호</dt><dd>' + v.plate + '</dd><dt>현장 번호</dt><dd class="strong">' + esc(c.plate) + '</dd><dt>차종</dt><dd>' + esc(c.typeSame ? v.type : c.type) + (c.typeSame === false ? ' <span class="tiny">(배정과 다름)</span>' : '') + '</dd><dt>색상</dt><dd>' + esc(c.colorSame ? v.color : c.color) + (c.colorSame === false ? ' <span class="tiny">(배정과 다름)</span>' : '') + '</dd><dt>사진</dt><dd>번호판 · 전면 2장</dd>' + (c.memo ? '<dt>메모</dt><dd>' + esc(c.memo) + '</dd>' : '') + '<dt>요청 시각</dt><dd>' + c.at + '</dd></dl></div>';
+    if (c.status === 'REQUESTED') {
+      html += '<div class="sim"><span class="t">데모 · 운영실 응답 시뮬레이션</span><div class="btnrow"><button type="button" class="btn sm" style="flex:1;background:var(--ok-soft);color:var(--ok)" data-act="decide" data-v="APPROVED">승인</button><button type="button" class="btn sm line" style="flex:1" data-act="decide" data-v="REJECTED">반려</button></div><span class="tiny">실제 앱에서는 운영실 화면에서 처리되며 크루에게 알림으로 옵니다.</span></div>'
+        + '<div class="cta-bar"><button type="button" class="btn primary" disabled>작업 시작</button><button type="button" class="btn line" data-go="list">다른 차량 먼저 작업</button></div>';
+    } else if (c.status === 'APPROVED') {
+      html += '<div class="cta-bar"><button type="button" class="btn primary" data-act="start-work">작업 시작</button></div>';
+    } else {
+      html += '<div class="cta-bar"><button type="button" class="btn primary" disabled>작업 시작</button><button type="button" class="btn line" data-act="retry">다시 입력</button><button type="button" class="btn purple" data-act="to-correction" data-reason="' + esc(c.reason) + '">정정 요청 다시 작성</button></div>';
+    }
+    return html + '</main>';
+  };
+
+  function elapsed(vs) { if (!vs.work || !vs.work.started) return '00:00'; var end = vs.work.finished ? vs.work.finishedAt : Date.now(); var s = Math.floor((end - vs.work.started) / 1000); var m = Math.floor(s / 60); s = s % 60; return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s; }
+  R.work = function () {
+    var v = V(), vs = VS(); var ep = effectivePlate(S.cur); var corrected = vs.correction && vs.correction.status === 'APPROVED';
+    return head(vs.work.finished ? '작업 완료' : '작업 중', 'detail', v.id)
+      + '<main class="page">'
+      + '<div class="row between"><span class="plate xl">' + esc(ep) + '</span><span class="badge lime"><i class="dot"></i>' + (vs.work.finished ? '완료' : '작업 중') + '</span></div>'
+      + '<div class="card" style="align-items:center;text-align:center;gap:4px"><span class="small">작업 시간</span><span class="timer" id="timer">' + elapsed(vs) + '</span><span class="tiny">기준 20 – 30분</span></div>'
+      + '<div class="card flat"><dl class="kv"><dt>확인 방식</dt><dd>' + methodLabel(vs) + '</dd>' + (corrected ? '<dt>배정 번호</dt><dd>' + v.plate + ' <span class="tiny">(변경 없음)</span></dd>' : '') + '<dt>주차 위치</dt><dd>' + v.spot + '</dd></dl></div>'
+      + '<div class="steps">'
+      + '<div class="step done"><div class="b">✓</div><div><div class="t">차량 확인</div><div class="s">' + methodLabel(vs) + '</div></div></div>'
+      + '<div class="step ' + (vs.work.finished ? 'done' : 'now') + '"><div class="b">' + (vs.work.finished ? '✓' : '2') + '</div><div><div class="t">Before 사진 · 세차 · After 사진</div><div class="s">기존 작업 흐름 (이 데모 범위 밖)</div></div></div>'
+      + '<div class="step ' + (vs.work.finished ? 'done' : '') + '"><div class="b">' + (vs.work.finished ? '✓' : '3') + '</div><div><div class="t">완료 보고</div></div></div>'
+      + '</div>'
+      + '<div class="cta-bar">' + (vs.work.finished ? '<button type="button" class="btn primary" data-go="list">다음 차량으로</button>' : '<button type="button" class="btn primary" data-act="finish-work">작업 완료</button>') + '</div></main>';
+  };
+
+  // ---------- Actions ----------
+  function val(id) { var el = document.getElementById(id); return el ? el.value : ''; }
+  function scanStep() {
+    var sc = S.scan; if (!sc.running) return;
+    if (sc.step < DECOYS.length) { sc.reading = DECOYS[sc.step] + ' · 확인 필요'; sc.step++; render(); timers.scan = setTimeout(scanStep, 900); return; }
+    sc.running = false; sc.found = true; sc.reading = V().plate; vibrate([60, 40, 60]); render();
+  }
+  function goCorrection(reason) {
+    var vs = VS(), prev = vs.correction;
+    vs.correction = { id: prev ? prev.id : 'RQ-' + String(Math.floor(Math.random() * 900) + 100), plate: vs.input, reason: reason, photoPlate: false, photoFront: false, typeSame: null, type: '', colorSame: null, color: '', memo: prev ? prev.memo : '', status: 'DRAFT', at: '' };
+    S.screen = 'correction';
+  }
+  function syncCorrectionForm() { var c = VS().correction; if (!c) return; if (document.getElementById('f-actual')) c.plate = val('f-actual'); if (document.getElementById('f-memo')) c.memo = val('f-memo'); if (document.getElementById('f-type')) c.type = val('f-type'); if (document.getElementById('f-color')) c.color = val('f-color'); }
+
+  var ACT = {
+    'pick': function (b) { S.cur = Number(b.getAttribute('data-v')); S.screen = 'detail'; },
+    'scan-open': function () { S.scan = { running: false, found: false, reading: '', step: 0 }; S.screen = 'scan'; },
+    'scan-start': function () { S.scan.running = true; S.scan.found = false; S.scan.step = 0; S.scan.reading = '인식 중…'; timers.scan = setTimeout(scanStep, 700); },
+    'scan-stop': function () { stopScan(); S.scan.reading = ''; },
+    'scan-reset': function () { stopScan(); S.scan.found = false; S.scan.reading = ''; },
+    'confirm-scan': function () { var vs = VS(); vs.ident = 'matched'; vs.method = 'scan'; vs.input = V().plate; S.screen = 'match'; },
+    'manual-open': function () { stopScan(); S.manualErr = ''; S.screen = 'manual'; },
+    'fill': function (b) { VS().input = b.getAttribute('data-v'); S.manualErr = ''; },
+    'manual-confirm': function () {
+      var vs = VS(); var v = val('f-plate'); vs.input = v;
+      if (norm(v).length < 7) { S.manualErr = '차량번호를 7자 이상 입력하세요. 예 123가1234'; return; }
+      S.manualErr = '';
+      if (norm(v) === norm(V().plate)) { vs.ident = 'matched'; vs.method = 'manual'; vibrate(40); S.screen = 'match'; }
+      else { vs.ident = 'mismatch'; vs.method = 'manual'; vibrate([30, 30, 30, 30, 120]); S.screen = 'mismatch'; }
+    },
+    'retry': function () { var vs = VS(); vs.ident = 'pending'; S.manualErr = ''; S.screen = 'manual'; },
+    'to-correction': function (b) { goCorrection(b.getAttribute('data-reason')); },
+    'photo': function (b) { syncCorrectionForm(); var c = VS().correction; if (b.getAttribute('data-v') === 'plate') c.photoPlate = true; else c.photoFront = true; toast('촬영됨 (데모)'); },
+    'same': function (b) { syncCorrectionForm(); var c = VS().correction; var k = b.getAttribute('data-k'); var same = b.getAttribute('data-v') === '1'; if (k === 'type') { c.typeSame = same; if (same) c.type = ''; } else { c.colorSame = same; if (same) c.color = ''; } },
+    'submit': function () {
+      syncCorrectionForm(); var c = VS().correction; c.plate = norm(c.plate);
+      if (!(c.photoPlate && c.photoFront) || norm(c.plate).length < 7) return;
+      c.status = 'REQUESTED'; c.at = now(); vibrate(40); S.screen = 'status'; toast('운영실에 요청했어요');
+    },
+    'decide': function (b) { var c = VS().correction; c.status = b.getAttribute('data-v'); vibrate(c.status === 'APPROVED' ? [60, 40, 60] : [30, 30, 30]); },
+    'start-work': function () { var vs = VS(); if (!canStart(vs)) { toast('번호 확인이 끝나야 시작할 수 있어요'); return; } vs.work = { started: Date.now(), finished: false, finishedAt: null }; S.screen = 'work'; },
+    'finish-work': function () { var vs = VS(); vs.work.finished = true; vs.work.finishedAt = Date.now(); vibrate(40); },
+    'reset': function () { stopScan(); S = fresh(); try { localStorage.removeItem(KEY); } catch (e) {} toast('데모를 초기화했어요'); }
+  };
+
+  // ---------- Render ----------
+  function render() {
+    var app = document.getElementById('app');
+    if (S.screen === 'correction') syncCorrectionForm();
+    app.innerHTML = R[S.screen] ? R[S.screen]() : R.list();
+    window.scrollTo(0, 0);
+    if (timers.tick) { clearInterval(timers.tick); timers.tick = null; }
+    var vs = S.v[S.cur];
+    if (S.screen === 'work' && vs.work && !vs.work.finished) timers.tick = setInterval(function () { var t = document.getElementById('timer'); if (t) t.textContent = elapsed(vs); }, 1000);
+    if (S.screen === 'manual') { var el = document.getElementById('f-plate'); if (el && !S.manualErr) el.focus({ preventScroll: true }); }
+    persist();
+  }
+
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-act],[data-go]');
+    if (!b) return;
+    var go = b.getAttribute('data-go');
+    if (go) { if (S.screen === 'correction') syncCorrectionForm(); stopScan(); S.screen = go; render(); return; }
+    var act = b.getAttribute('data-act');
+    if (ACT[act]) { ACT[act](b); render(); }
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && e.target && e.target.id === 'f-plate') { e.preventDefault(); ACT['manual-confirm'](); render(); }
+  });
+  document.addEventListener('input', function (e) {
+    if (S.screen === 'correction') { syncCorrectionForm(); var btn = document.querySelector('[data-act="submit"]'); if (btn) { var c = VS().correction, v = V(); var typeOk = unknown(v.type) ? norm(c.type).length > 0 : (c.typeSame === true || (c.typeSame === false && norm(c.type).length > 0)); var colorOk = unknown(v.color) ? norm(c.color).length > 0 : (c.colorSame === true || (c.colorSame === false && norm(c.color).length > 0)); btn.disabled = !(norm(c.plate).length >= 7 && c.photoPlate && c.photoFront && typeOk && colorOk); } }
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

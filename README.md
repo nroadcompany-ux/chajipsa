@@ -27,6 +27,9 @@ npm run build
 - Push: DEMO or not integrated
 - Backend: not production-connected
 
+## Crew Mobile Demo
+`apps/crew-demo/index.html` — single-file mobile click demo of the Crew vehicle identification flow (assigned vehicle list → detail → locate → plate scan simulation / manual input → match or mismatch gate → ops correction request → approval simulation → work start). Static HTML, no build step; deployed on Vercel with root directory `apps/crew-demo`. All plates and customer data are DEMO fixtures.
+
 ## Repository Status (2026-09-10)
 - PWA source (React 19 + TypeScript + Vite): **NOT YET PUSHED** — the working folder was not available in the remote session that initialized this repository. `npm install` / `npm run dev` / `npm run build` do not work until it lands.
 - Current Prototype v0.4 (`prototype/chajipsa_prototype-current-v0.4.html`): **PENDING** — see `prototype/README.md`.
