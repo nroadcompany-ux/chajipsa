@@ -16,4 +16,4 @@ Rules
 
 | File | Purpose | Status |
 |------|---------|--------|
-| `reference/crew-vehicle-plate-correction-demo.html` | Crew 차량번호 입력·정정 요청 Flow (P0) reference demo. Fixtures `123가1234` (SUV, 브라운·그레이), `26모2057` (승용 BMW 520d, 흰색) and `228나5331` (type/color pending), all DEMO, switchable on the Work Order screen; mismatch examples `123가5678` / `26모2075` / `228나5313`. States: `VEHICLE_CORRECTION_REQUESTED / APPROVED / REJECTED`. Approval applies to one Work Order only; Master Vehicle never changes from the crew screen. | DONE as standalone reference. NOT yet merged into v0.4 HTML or the PWA. |
+| `reference/crew-vehicle-plate-correction-demo.html` | Crew 차량번호 입력·정정 요청 Flow (P0) reference demo. Fixtures `123가1234` (SUV, 브라운·그레이), `26모2057` (승용 BMW 520d, 흰색) and `228나5331` (승용 BMW 520d, 다크그레이), all DEMO, switchable on the Work Order screen; mismatch examples `123가5678` / `26모2075` / `228나5313`. States: `VEHICLE_CORRECTION_REQUESTED / APPROVED / REJECTED`. Approval applies to one Work Order only; Master Vehicle never changes from the crew screen. | DONE as standalone reference. NOT yet merged into v0.4 HTML or the PWA. |
