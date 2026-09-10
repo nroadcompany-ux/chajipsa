@@ -118,6 +118,7 @@
   .input.err { border-color:var(--danger); }
   .errmsg { font-size:12px; color:var(--danger-800); }
   .choice { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .choice.three { grid-template-columns:1fr 1fr 1fr; }
   .choice button { border:1px solid var(--line); background:var(--white); border-radius:var(--r-btn); padding:11px; font-weight:700; color:var(--steel); }
   .choice button[aria-pressed="true"] { border-color:var(--primary); color:var(--p700); background:var(--p50); }
 
@@ -192,7 +193,7 @@
         <div class="statusbar"><span>21:04</span><div class="notch"></div><span>●●● ⌁</span></div>
         <div class="screen" id="screen"></div>
       </div>
-      <p class="hint">모든 차량번호는 DEMO 값입니다. 배정 <b>123가1234</b> / <b>26모2057</b> · 불일치 예시는 화면 안 버튼으로</p>
+      <p class="hint">모든 차량번호는 DEMO 값입니다. 배정 <b>123가1234</b> / <b>26모2057</b> / <b>228나5331</b> · 불일치 예시는 화면 안 버튼으로</p>
     </div>
   </main>
 </div>
@@ -204,7 +205,8 @@
   // ---------- Fixture (DEMO) ----------
   var VEHICLES = [
     { id: 'VEH-DEMO-001', wo: 'WO-DEMO-001', plate: '123가1234', type: 'SUV', color: '브라운·그레이', spot: '지하 1층 B-27', plan: '월 4회 · 3회차', mismatch: '123가5678' },
-    { id: 'VEH-DEMO-002', wo: 'WO-DEMO-002', plate: '26모2057', type: '승용 · BMW 520d', color: '흰색', spot: '지하 1층 B-31', plan: '월 2회 · 1회차', mismatch: '26모2075' }
+    { id: 'VEH-DEMO-002', wo: 'WO-DEMO-002', plate: '26모2057', type: '승용 · BMW 520d', color: '흰색', spot: '지하 1층 B-31', plan: '월 2회 · 1회차', mismatch: '26모2075' },
+    { id: 'VEH-DEMO-003', wo: 'WO-DEMO-003', plate: '228나5331', type: '미지정 (DEMO)', color: '미지정 (DEMO)', spot: '지하 2층 C-08', plan: '1회 이용', mismatch: '228나5313' }
   ];
   var MASTER = VEHICLES[0];
   var WO = { id: '', spot: '', site: '지산동 그린타운', slot: '21:00 – 23:00', plan: '' };
@@ -225,7 +227,7 @@
     ['approval', '승인 Simulation'],
     ['workAfter', '승인 후 Work Order 진행'],
     ['scan', '기존 Scan Flow 유지 (Scan → Match → 시작)'],
-    ['fixture', 'Fixture 유지 · 123가1234 · 26모2057']
+    ['fixture', 'Fixture 유지 · 123가1234 · 26모2057 · 228나5331']
   ];
   var FLOW = [
     ['k-wo', '배정 차량 (Work Order)'],
@@ -294,7 +296,7 @@
   R['k-wo'] = function () {
     return '<div class="page">' + head(WO.id, { right: WO.slot })
       + '<div class="row"><span class="pill neutral">' + WO.site + '</span><span class="pill purple">' + MASTER.type + '</span></div>'
-      + '<div class="field"><label>오늘 배정 차량 <span class="small">(' + VEHICLES.length + '대 · 전환하면 확인 상태 초기화)</span></label><div class="choice">'
+      + '<div class="field"><label>오늘 배정 차량 <span class="small">(' + VEHICLES.length + '대 · 전환하면 확인 상태 초기화)</span></label><div class="choice' + (VEHICLES.length === 3 ? ' three' : '') + '">'
       + VEHICLES.map(function (v, i) { return '<button type="button" data-act="pick" data-v="' + i + '" aria-pressed="' + (S.vehicle === i) + '">' + v.plate + '<br><span class="small" style="font-weight:400">' + v.type + '</span></button>'; }).join('')
       + '</div></div>'
       + vehicleCard()
