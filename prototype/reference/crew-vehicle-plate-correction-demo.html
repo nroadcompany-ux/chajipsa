@@ -118,7 +118,14 @@
   .input.err { border-color:var(--danger); }
   .errmsg { font-size:12px; color:var(--danger-800); }
   .choice { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-  .choice.three { grid-template-columns:1fr 1fr 1fr; }
+  .vlist { display:flex; flex-direction:column; border:1px solid var(--line); border-radius:var(--r-card); background:var(--white); overflow:hidden; }
+  .vlist button { display:flex; align-items:center; gap:12px; width:100%; text-align:left; border:0; border-top:1px solid var(--line-soft); background:transparent; padding:11px 14px; color:var(--ink); }
+  .vlist button:first-child { border-top:0; }
+  .vlist button .n { font-family:var(--serif); font-size:13px; color:var(--neutral); min-width:18px; }
+  .vlist button .pl { font-weight:800; font-size:16px; letter-spacing:0.03em; font-variant-numeric:tabular-nums; }
+  .vlist button .d { font-size:12px; color:var(--neutral); }
+  .vlist button .grow { flex:1; min-width:0; }
+  .vlist button[aria-pressed="true"] { background:var(--p50); box-shadow:inset 3px 0 0 var(--primary); }
   .choice button { border:1px solid var(--line); background:var(--white); border-radius:var(--r-btn); padding:11px; font-weight:700; color:var(--steel); }
   .choice button[aria-pressed="true"] { border-color:var(--primary); color:var(--p700); background:var(--p50); }
 
@@ -193,7 +200,7 @@
         <div class="statusbar"><span>21:04</span><div class="notch"></div><span>●●● ⌁</span></div>
         <div class="screen" id="screen"></div>
       </div>
-      <p class="hint">모든 차량번호는 DEMO 값입니다. 배정 <b>123가1234</b> / <b>26모2057</b> / <b>228나5331</b> · 불일치 예시는 화면 안 버튼으로</p>
+      <p class="hint">모든 차량번호는 DEMO 값입니다. 배정 차량 4대 (Work Order 화면에서 선택) · 불일치 예시는 화면 안 버튼으로</p>
     </div>
   </main>
 </div>
@@ -206,7 +213,8 @@
   var VEHICLES = [
     { id: 'VEH-DEMO-001', wo: 'WO-DEMO-001', plate: '123가1234', type: 'SUV', color: '브라운·그레이', spot: '지하 1층 B-27', plan: '월 4회 · 3회차', mismatch: '123가5678' },
     { id: 'VEH-DEMO-002', wo: 'WO-DEMO-002', plate: '26모2057', type: '승용 · BMW 520d', color: '흰색', spot: '지하 1층 B-31', plan: '월 2회 · 1회차', mismatch: '26모2075' },
-    { id: 'VEH-DEMO-003', wo: 'WO-DEMO-003', plate: '228나5331', type: '승용 · BMW 520d', color: '다크그레이', spot: '지하 2층 C-08', plan: '1회 이용', mismatch: '228나5313' }
+    { id: 'VEH-DEMO-003', wo: 'WO-DEMO-003', plate: '228나5331', type: '승용 · BMW 520d', color: '다크그레이', spot: '지하 2층 C-08', plan: '1회 이용', mismatch: '228나5313' },
+    { id: 'VEH-DEMO-004', wo: 'WO-DEMO-004', plate: '314주4191', type: '미지정 (DEMO)', color: '미지정 (DEMO)', spot: '지하 2층 C-14', plan: '월 2회 · 2회차', mismatch: '314주4119' }
   ];
   var MASTER = VEHICLES[0];
   var WO = { id: '', spot: '', site: '지산동 그린타운', slot: '21:00 – 23:00', plan: '' };
@@ -227,7 +235,7 @@
     ['approval', '승인 Simulation'],
     ['workAfter', '승인 후 Work Order 진행'],
     ['scan', '기존 Scan Flow 유지 (Scan → Match → 시작)'],
-    ['fixture', 'Fixture 유지 · 123가1234 · 26모2057 · 228나5331']
+    ['fixture', 'Fixture 유지 · 123가1234 · 26모2057 · 228나5331 · 314주4191']
   ];
   var FLOW = [
     ['k-wo', '배정 차량 (Work Order)'],
@@ -296,8 +304,8 @@
   R['k-wo'] = function () {
     return '<div class="page">' + head(WO.id, { right: WO.slot })
       + '<div class="row"><span class="pill neutral">' + WO.site + '</span><span class="pill purple">' + MASTER.type + '</span></div>'
-      + '<div class="field"><label>오늘 배정 차량 <span class="small">(' + VEHICLES.length + '대 · 전환하면 확인 상태 초기화)</span></label><div class="choice' + (VEHICLES.length === 3 ? ' three' : '') + '">'
-      + VEHICLES.map(function (v, i) { return '<button type="button" data-act="pick" data-v="' + i + '" aria-pressed="' + (S.vehicle === i) + '">' + v.plate + '<br><span class="small" style="font-weight:400">' + v.type + '</span></button>'; }).join('')
+      + '<div class="field"><label>오늘 배정 차량 <span class="small">(' + VEHICLES.length + '대 · 이동 순서 · 전환하면 확인 상태 초기화)</span></label><div class="vlist">'
+      + VEHICLES.map(function (v, i) { return '<button type="button" data-act="pick" data-v="' + i + '" aria-pressed="' + (S.vehicle === i) + '"><span class="n">' + (i + 1) + '</span><div class="grow"><div class="pl">' + v.plate + '</div><div class="d">' + v.type + ' · ' + v.color + ' · ' + v.spot + '</div></div>' + (S.vehicle === i ? '<span class="pill purple">선택</span>' : '') + '</button>'; }).join('')
       + '</div></div>'
       + vehicleCard()
       + '<div class="card soft"><div class="h2" style="font-size:14px">작업 전 확인</div><div class="stack" style="font-size:13px;color:var(--steel)"><div>✓ 번호판 일치 확인 (스캔 또는 직접 입력)</div><div>✓ 번호가 다르면 작업 시작 금지 → 운영실 확인 요청</div><div>✓ Before 사진 3장 이상</div></div></div>'
