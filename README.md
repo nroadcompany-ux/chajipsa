@@ -32,3 +32,4 @@ npm run build
 - Current Prototype v0.4 (`prototype/chajipsa_prototype-current-v0.4.html`): **PENDING** — see `prototype/README.md`.
 - Test vehicle assets (`prototype/chajipsa_assets/`): **PENDING** — no substitute images were generated.
 - `prototype/archive/`: earlier MVP1 click prototype preserved for version history.
+- `prototype/reference/crew-vehicle-plate-correction-demo.html`: reference implementation of the Crew Vehicle Identification safety flow (manual plate input → mismatch gate → correction request → approval simulation → work start blocking). Port target: Prototype v0.4 and PWA components `VehiclePlateManualInput` / `VehicleMismatchGate` / `VehicleCorrectionRequest`. Not yet applied to v0.4 or the PWA (sources not available).

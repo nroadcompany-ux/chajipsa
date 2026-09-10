@@ -11,3 +11,9 @@ Purpose: keep the HTML prototypes that preceded the PWA, for regression comparis
 Rules
 - Do not rewrite v0.4 when adding it; commit the file as delivered.
 - Prototypes here are static HTML and are not part of the PWA build.
+
+## Reference implementations
+
+| File | Purpose | Status |
+|------|---------|--------|
+| `reference/crew-vehicle-plate-correction-demo.html` | Crew 차량번호 입력·정정 요청 Flow (P0) reference demo. Fixture `123가1234` (SUV, 브라운·그레이, DEMO), mismatch example `123가5678`. States: `VEHICLE_CORRECTION_REQUESTED / APPROVED / REJECTED`. Approval applies to one Work Order only; Master Vehicle never changes from the crew screen. | DONE as standalone reference. NOT yet merged into v0.4 HTML or the PWA. |
